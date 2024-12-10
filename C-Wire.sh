@@ -15,7 +15,7 @@ aide(){
     	echo "Options interdites :"
     	echo " hvb all, hvb indiv, hva all, hva indiv"
     	echo "  -h                 : Affiche cette aide (prioritaire)"
-}
+} 
 
 if [[ "$#" -lt 3 ] || [[ "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
 	aide
@@ -30,44 +30,75 @@ id_centrale=$4
 if [ ! -f "$chemin_fichier" ]; then
     echo "Erreur : Le fichier CSV '$chemin_fichier' est n'existe pas."
     aide
-    exit 1
+    echo "temps : 0.0sec"
+    exit 2
 fi
 
 if [[ "$station" != "hvb" && "$station" != "hva" && "$station" != "lv" ]]; then
     echo "Erreur : La station saisie n'existe pas. Valeurs possibles : hvb, hva, lv."
     aide
-    exit 1
+    echo "temps : 0.0sec"
+    exit 3
 fi
 
 if [[ "$conso" != "comp" && "$conso" != "indiv" && "$conso" != "all" ]]; then
     echo "Erreur : Le consommateur saisie n'existe pas. Valeurs possibles : comp, indiv, all."
     aide
-    exit 1
+    exit 4
 fi
 
 # Vérifications des restrictions spécifiques
 if [[ "$station" == "hvb" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; then
     echo "Erreur : Les options 'hvb all' et 'hvb indiv' sont interdites."
     aide
-    exit 1
+    echo "temps : 0.0sec"
+    exit 5
 fi
 if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; then
     echo "Erreur : Les options 'hva all' et 'hva indiv' sont interdites."
     aide
-    exit 1
+    echo "temps : 0.0sec"
+    exit 6
 fi
 
 # Vérification de l'exécutable C
-executable="./cwire_program"
-if [ ! -f "$executable" ]; then
+executable="./C-Wire_pg" #explique le chemin et pour trouver l'executable qui se trouve dans le meme repertoire que le script shell
+if [ ! -f "$executable" ]; then #si l'executable n'existe pas
     echo "Compilation du programme C..."
-    make -C codeC
-    if [ $? -ne 0 ]; then
+    make -C C-Wire # penser a appeler le makefile C-Wire 
+    if [ $? -ne 0 ]; then # si le make a échouer on affiche une erreur 
         echo "Erreur : Échec de la compilation du programme C."
-        exit 1
+        echo "temps : 0.0sec"
+        exit 7
     fi
 fi
 
+if [ ! -d "tmp" ]; then
+    echo "Le dossier 'tmp' n'existe pas. Création du dossier."
+    mkdir -p tmp
+else
+    echo "Le dossier 'tmp' existe déjà. Il sera vidé."
+    rm -rf tmp/* #surprime tout ce qui est a l'interieur  
+fi
+
+# Vérification et création du dossier graphs
+if [ ! -d "graphs" ]; then
+    echo "Le dossier 'graphs' n'existe pas. Création du dossier."
+    mkdir -p graphs
+else
+    echo "Le dossier 'graphs' existe déjà."
+fi
+
+debut = $(date + %s)
+
+#faire le scrpit avec le filtrage
+
+
+fin = $(date + %s)
+
+
+duree = $(debut - fin)
+echo "temps : $dureesec"
 
 
 
