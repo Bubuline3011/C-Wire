@@ -3,9 +3,17 @@
 
 
 typedef struct station {
-    int identifiant;
-    long capacite;
-    long som_conso;
+    char type_station[10];
+    int id; //identifiant d’une centrale électrique
+   /* int id_B; //identifiant d’une station HV-B
+    int id_A; //identifiant d’une station HV-A
+    int id_LV; //identifiant d’un poste LV
+    int id_e; //identifiant d’une entreprise (consommateur)
+    int id_p; //identifiant d’un particulier (consommateur) */
+    int load; //quantité d’énergie consommée par le consommateur final entreprise ou particulier
+    int capacite;//quantité d’énergie produite par une centrale
+    int som_conso; // sommes de consomation
+    
 }Station; 
 
 typedef struct AVL{
@@ -18,13 +26,6 @@ typedef struct AVL{
 
 typedef AVL* pavl;
 
-int hateur(Pavl n){
-  if(n==NULL){
-      return 0; // l'arbre est vide son hauteur = 0
-  }else{
-      return->eq; // renvoyer la valeur d'hauter
-         }
-  }
 
 Pavl CreerAvl(Station * station){
 Pavl arbre =malloc(sizeof(Pavl):
@@ -35,13 +36,14 @@ if(arbre==NULL){
 arbre->station->station;
 arbre->fg=NULL;
 arbre->fd=NULL;
-arbre->eq=;
+arbre->eq=0;
 }
 
 pavl  rotationGauche(pavl a){
     pavl pivot;
     int eq_a, eq_p;
     pivot = a->fd;
+pavl doubleRotationDroite(pavl a){
     a->fd = pivot->fg;
     pivot->fg = a;
     eq_a = a->equilibre;
@@ -76,7 +78,7 @@ pavl doubleRotationDroite(pavl a){
     return rotationDroite(a);
 }
 
-pavl insertionAVL(pavl a, int e, int * h){
+pavl insertionAVL(pavl a, Station* e, int * h){
     if(a== NULL){
         *h = 1;
         return creerArbre(e);
