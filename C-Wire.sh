@@ -1,4 +1,5 @@
 #!/bin/bash
+
 #Fonction pour aider l'utilisateur
 aide(){
 	echo "Le script premet de filtrer les donneés d'un fichier, crée un fichier qui contient une liste avec toutes les stations et d'autres inforations (somme des consommateurs etc)"
@@ -14,10 +15,10 @@ aide(){
     	echo "  <id_centrale>      : Identifiant de la centrale (option)"
     	echo "Options interdites :"
     	echo " hvb all, hvb indiv, hva all, hva indiv"
-    	echo "  -h                 : Affiche cette aide (prioritaire)"
+    	echo "  -h                 : Affiche cette aide et ignore tous les autres paramètres (optionnel)."
 } 
 
-if [[ "$#" -lt 3 ] || [[ "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
+if [[ "$#" -lt 3 ]] || [[ "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
 	aide
 	exit 1
 fi
@@ -27,12 +28,14 @@ station=$2
 conso=$3
 id_centrale=$4
 
-if [ ! -f "$chemin_fichier" ]; then
+if [ ! -f "$chemin_fichier" ]; then #verifier si le fichier existe
     echo "Erreur : fichier introuvable"
     aide
     echo "temps : 0.0sec"
     exit 2
 fi
+
+#verifier si le type de station  et le consommateur ecrit est valide
 
 if [[ "$station" != "hvb" && "$station" != "hva" && "$station" != "lv" ]]; then
     echo "Erreur : La station n'existe pas. Valeurs possibles : hvb, hva, lv."
@@ -62,6 +65,7 @@ if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; th
 fi
 
 # Vérification de l'exécutable C
+
 executable="./C-Wire_pg" #explique le chemin et pour trouver l'executable qui se trouve dans le meme repertoire que le script shell
 if [ ! -f "$executable" ]; then #si l'executable n'existe pas
     echo "Compilation du programme C..."
@@ -72,7 +76,7 @@ if [ ! -f "$executable" ]; then #si l'executable n'existe pas
         exit 7
     fi
 fi
-
+# on verfie que le fichier tmp n'existe pas et on le creer sinon ont le vide
 if [ ! -d "tmp" ]; then
     echo "Le dossier 'tmp' n'existe pas. Création."
     mkdir -p tmp
@@ -81,7 +85,7 @@ else
     rm -rf tmp/* #surprime tout ce qui est a l'interieur  
 fi
 
-# Vérification et création du dossier graphs
+# on verfie que le fichier graph n'existe pas et on le creer 
 if [ ! -d "graphs" ]; then
     echo "Le dossier 'graphs' n'existe pas. Création."
     mkdir -p graphs
@@ -89,43 +93,53 @@ else
     echo "Le dossier 'graphs' existe déjà."
 fi
 
-debut=$(date + %s) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
+debut=$(date +%s) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
 
 #filtrage
-gcc -o projet projet.c
 
-if [[ "$2" == "hvb" ]] && [[ "$3" == "comp" ]]; then # si l'utilisateur rentre hvb comp
-	
+filtre_centrale=""
+if [[ ! -z "$id_centrale" ]]; then
+    filtre_centrale="&& \$1 == \"$id_centrale\""
+fi
 
-fi 
+# Filtrage et traitement selon les paramètres
+if [[ "$station" == "hvb" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations hvb avec des entreprises, passer au programme C, et enregistrer dans hvb_comp.csv.
+    awk -F ';' "\$2 != \"-\" && \$4 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |
+        cut -d';' -f2,5,7,8 | tr '-' '0' | $executable > hvb_comp.csv
+    sort -t ':' -k2 -n hvb_comp.csv -o hvb_comp.csv #trier par ordre croissant
+fi
 
-if [[ "$2" == "hva" ]] && [[ "$3" == "comp" ]]; then #si l'utilisateur ecrit hva comp
-	
-fi 
+if [[ "$station" == "hva" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations HVA avec entreprises, passer au programme C, et enregistrer dans hva_comp.csv.
+	awk -F ';' "\$3 != \"-\" && \$5 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f3,5,7,8 | tr '-' '0' | $executable > hva_comp.csv
+        sort -t ':' -k2 -n hva_comp.csv -o hva_comp.csv 
+fi
 
-if [[ "$2" == "lv" ]] && [[ "$3" == "comp" ]]; then # si l'utilisateur rentre lv comp
-	
+if [[ "$station" == "lv" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations LV avec des entreprises, passer au programme C, et enregistrer dans lv_comp.csv.
+	awk -F ';' "\$4 != \"-\" && \$5 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,5,7,8 | tr '-' '0' | $executable > lv_comp.csv
+	sort -t ':' -k2 -n lv_comp.csv -o lv_comp.csv
+fi
 
-fi 
+if [[ "$station" == "lv" ]] && [[ "$conso" == "indiv" ]]; then # Filtrer les données pour les stations LV avec des consommateurs individuels, passer au programme C, et enregistrer dans lv_indiv.csv.
+	awk -F ';' "\$4 != \"-\" && \$6 != \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,6,7,8 | tr '-' '0' | $executable > lv_indiv.csv
+	sort -t ':' -k2 -n lv_indiv.csv -o lv_indiv.csv
+fi
 
-if [[ "$2" == "lv" ]] && [[ "$3" == "indiv" ]]; then # si l'utilisateur rentre lv indiv
-	
+if [[ "$station" == "lv" ]] && [[ "$conso" == "all" ]]; then # Filtrer les données pour les stations LV avec tous les types de consommateurs (entreprises et particuliers), passer au programme C, et enregistrer dans tmp/lv_all.csv.
+	awk -F ';' "\$4 != \"-\" && (\$5 != \"-\" || \$6 != \"-\") $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,5,6,7 | tr '-' '0' | $executable > tmp/lv_all.csv
+	sort -t ':' -k2 -n tmp/lv_all.csv -o tmp/lv_all.csv
+fi
 
-fi 
+# Trier les résultats pour les 10 postes les plus et les moins chargés
+# Pour les 10 plus chargés (max)
+sort -t';' -k5n tmp/lv_all.csv | tail -n 10 > lv_all_max.csv #tail permet d'afficher les dernières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
 
-if [[ "$2" == "lv" ]] && [[ "$3" == "all" ]]; then # si l'utilisateur rentre lv all
-	
+# Pour les 10 moins chargés (min)
+sort -t';' -k5n tmp/lv_all.csv | head -n 10 > lv_all_min.csv #head permet d'afficher les premières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
 
-fi 
-
-# il manque le cas ou l'utilsateur met une option avec l'identifiant de la central
-
-fin=$(date + %s) #prend l'heure a la fin du filtrage
-
-
-duree=$(debut - fin) # on fait la différence pour avoir le temps total d'execution
+fin=$(date +%s) #prend l'heure a la fin du filtrage
+duree=$((fin - debut)) # on fait la différence pour avoir le temps total d'execution
 echo "temps : $duree sec" # on affiche ce temps
-
+echo "FIN du script"
 
 
 
