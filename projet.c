@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include<stdlib.h>
 
-
+// Définition de la structure 'Station' qui représente une station
 typedef struct station {
-    char type_station[10];
-    int id; //identifiant d’une centrale électrique
+    char type_station[10]; // Type de la station (hvb, hva, lv, etc.)
+    int id; //identifiant d’une centrale électrique 
    /* int id_B; //identifiant d’une station HV-B
     int id_A; //identifiant d’une station HV-A
     int id_LV; //identifiant d’un poste LV
@@ -16,6 +16,7 @@ typedef struct station {
     
 }Station; 
 
+// Définition de la structure 'AVL' pour l'arbre AVL
 typedef struct AVL{
     Station * station;
     struct AVL * fg;
@@ -23,90 +24,94 @@ typedef struct AVL{
     int eq;
 }AVL;
 
-
+// Définition d'un type pavl pour un pointeur vers un arbre AVL
 typedef AVL* pavl;
 
-
-Pavl CreerAvl(Station * station){
-Pavl arbre =malloc(sizeof(Pavl):
+// Fonction pour créer un arbre AVL avec une station donnée
+pavl CreerAvl(Station * station){
+pavl arbre =malloc(sizeof(Pavl); // Allocation dynamique pour un nouvel arbre AVL
 if(arbre==NULL){
-   exit(1); //Allocation echouée
+   exit(1); //Allocation échouée
    }
-   
-arbre->station->station;
-arbre->fg=NULL;
-arbre->fd=NULL;
-arbre->eq=0;
+arbre->station->station; // Associe la station à cet arbre
+arbre->fg=NULL; // Le sous-arbre gauche est initialement NULL
+arbre->fd=NULL; // Le sous-arbre droit est initialement NULL
+arbre->eq=0; L'équilibre initial de l'arbre est 0 (arbre vide)
+    return arbre;
 }
 
-pavl  rotationGauche(pavl a){
-    pavl pivot;
-    int eq_a, eq_p;
-    pivot = a->fd;
-pavl doubleRotationDroite(pavl a){
-    a->fd = pivot->fg;
-    pivot->fg = a;
-    eq_a = a->equilibre;
-    eq_p = pivot->equilibre;
-    a->equilibre = eq_a - max(eq_p, 0) -1;
-    pivot->equilibre = min(eq_a-2, eq_a + eq_p -2, eq_p -1);
-    a = pivot;
-    return a;
+// Fonction de rotation à gauche pour rééquilibrer l'arbre AVL
+pavl rotationGauche(pavl a) {
+   pavl pivot = a->fd; // Le fils droit devient le pivot
+    int eq_a = a->eq
+    eq_p = pivot->eq;
+    a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de `a`
+    pivot->fg = a;     // `a` devient le fils gauche du pivot
+
+    // Mise à jour des facteurs d'équilibre
+    a->eq = eq_a - max(eq_p, 0) - 1;
+    pivot->eq = min3(eq_a - 2, eq_a + eq_p - 2, eq_p - 1);
+
+    return pivot; // Le pivot devient la nouvelle racine
 }
 
-pavl rotationDroite(pavl a){
-    pavl pivot;
-    int eq_a, eq_p;
-    pivot = a->fg;
-    a->fg = pivot->fd;
-    pivot->fd = a;
-    eq_a = a->equilibre;
-    eq_p = pivot->equilibre;
-    a->equilibre = eq_a - min2(eq_p, 0) +1;
-    pivot->equilibre = max2(eq_a+2, eq_a + eq_p -2, eq_p +1);
-    a = pivot;
-    return a;
+// Fonction de rotation à droite pour rééquilibrer l'arbre AVL
+pavl rotationDroite(pavl a) {
+  pavl pivot = a->fg; // Le fils gauche devient le pivot
+    int eq_a = a->eq;
+    eq_p = pivot->eq;
+    a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de `a`
+    pivot->fd = a;     // `a` devient le fils droit du pivot
+
+    // Mise à jour des facteurs d'équilibre
+    a->eq = eq_a - min(eq_p, 0) + 1;
+    pivot->eq = max3(eq_a + 2, eq_a + eq_p + 2, eq_p + 1);
+
+    return pivot; // Le pivot devient la nouvelle racine
 }
 
-pavl doubleRotationGauche(pavl a){
-    a->fd = rotationDroite(a->fd);
-    return rotationGauche(a);
+// Fonction de double rotation à droite pour rééquilibrer l'arbre AVL
+pavl doubleRotationDroite(pavl a) {
+    a->fg = rotationGauche(a->fg);  // Effectuer une rotation à gauche sur le sous-arbre gauche
+    return rotationDroite(a);       // Ensuite, effectuer une rotation à droite
 }
 
-pavl doubleRotationDroite(pavl a){
-    a->fg = rotationGauche(a->fg);
-    return rotationDroite(a);
+// Fonction de double rotation à gauche pour rééquilibrer l'arbre AVL
+pavl doubleRotationGauche(pavl a) {
+    a->fd = rotationDroite(a->fd);  // Effectuer une rotation à droite sur le sous-arbre droit
+    return rotationGauche(a);       // Ensuite, effectuer une rotation à gauche
 }
 
-pavl insertionAVL(pavl a, Station* e, int * h){
-    if(a== NULL){
-        *h = 1;
-        return creerArbre(e);
-    }
-    else if(e< a->elmt){
-        a->fg = insertionAVL(a->fg, e, h);
-        *h = -*h;
-    }
-    else if(e>a->elmt){
-        a->fd = insertionAVL(a->fd, e, h);
-    }
-    else {
+// Fonction d'insertion d'une station dans l'arbre AVL avec rééquilibrage
+pavl insertionAVL(pavl a, Station* e, int *h) {
+    if (a == NULL) {
+        *h = 1;                      // Si l'arbre est vide, on crée un nouvel arbre
+        return CreerAvl(e);           // Créer un nouvel arbre avec la station
+    } 
+    else if (e < a->station) {         // Si la station est inférieure à la station actuelle
+        a->fg = insertionAVL(a->fg, e, h); // Insertion récursive dans le sous-arbre gauche
+        *h = -(*h);                  // Inverser l'état de hauteur
+    } 
+    else if (e > a->station) {         // Si la station est supérieure à la station actuelle
+        a->fd = insertionAVL(a->fd, e, h); // Insertion récursive dans le sous-arbre droit
+    } 
+    else {                            // Si la station est déjà présente, on ne l'insère pas
         *h = 0;
         return a;
     }
-    if(*h != 0){
-        a->equilibre = a->equilibre + *h;
-        a = equilibrerAVL(a);
-        if(a->equilibre == 0){
+
+    if (*h != 0) {                     // Si l'équilibre n'est pas nul
+        a->eq = a->eq + *h;            // Ajuster l'équilibre de l'arbre
+        a = equilibrerAVL(a);          // Équilibrer l'arbre après insertion
+        if (a->eq == 0) {              // Si l'arbre est équilibré après insertion
             *h = 0;
         }
         else {
-            *h = 0;
+            *h = 0;                   // Sinon, l'arbre reste déséquilibré
         }
     }
     return a;
 }
-
 
 
 
