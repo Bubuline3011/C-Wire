@@ -25,7 +25,7 @@ typedef struct AVL{
 typedef AVL* pavl;
 
 int hateur(Pavl n);
-Pavl CreerAvl(Station * station);pavl  rotationGauche(pavl a);
+pavl CreerAvl(Station * station);pavl  rotationGauche(pavl a);
 pavl  rotationGauche(pavl a);
 pavl rotationDroite(pavl a);
 pavl doubleRotationGauche(pavl a);
