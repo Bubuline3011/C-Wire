@@ -22,7 +22,7 @@ typedef struct AVL{
 
 typedef AVL* pavl;
 
-int hateur(Pavl n);
+int hauteur(pavl n);
 pavl CreerAvl(Station * station);pavl  rotationGauche(pavl a);
 pavl rotationGauche(pavl a);
 pavl rotationDroite(pavl a);
