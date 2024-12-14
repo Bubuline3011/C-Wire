@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include<stdlib.h>
-
+#include <stdlib.h>
 
 typedef struct station {
     char type_station[10];
@@ -21,12 +20,11 @@ typedef struct AVL{
     int eq;
 }AVL;
 
-
 typedef AVL* pavl;
 
 int hateur(Pavl n);
 pavl CreerAvl(Station * station);pavl  rotationGauche(pavl a);
-pavl  rotationGauche(pavl a);
+pavl rotationGauche(pavl a);
 pavl rotationDroite(pavl a);
 pavl doubleRotationGauche(pavl a);
 pavl doubleRotationDroite(pavl a);
