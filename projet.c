@@ -66,7 +66,7 @@ if(arbre==NULL){
 arbre->station->station; // Associe la station à cet arbre
 arbre->fg=NULL; // Le sous-arbre gauche est initialement NULL
 arbre->fd=NULL; // Le sous-arbre droit est initialement NULL
-arbre->eq=0; L'équilibre initial de l'arbre est 0 (arbre vide)
+arbre->eq=0; //L'équilibre initial de l'arbre est 0 (arbre vide)
     return arbre;
 }
 
