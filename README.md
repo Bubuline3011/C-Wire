@@ -21,7 +21,7 @@ Ci-après le sujet du projet : (Rapport de projet C-Wire.pdf)
 - **`projet.h`** : contient la déclaration de toutes les fonctions, les structures, les constantes et les inclusions de bibliothèques.
 - **`avl.c`** : contient toutes les fonctions relatives a l'avl, comme la creation, l'insertion, les différents types de rotations etc..
 - **`outil.c`** : contient les fonctions "outil" comme le calcule du minimum entre deux entier.
-- **`gerer_fichier.c`** : contient les fonctions qui créent les fichier de sortie et qui ecriventd edans.
+- **`gerer_fichier.c`** : contient les fonctions qui créent les fichier de sortie et qui ecrivent dedans.
 - **Makefile** : permet d'automatiser la compilation.
 - **Rapport de projet C-Wire.pdf** : contient un compte rendu sur l'organisation de l'équipe concernant le projet, les difficultés rencontrées et une brève description du projet.
 
