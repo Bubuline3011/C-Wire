@@ -14,6 +14,7 @@ Le programme permet de :
    - Calculer la somme des consommations des stations et détecter les surcharges ou sous-utilisations grâce à un arbre AVL (arbre binaire équilibré).
    - Exporter les résultats dans des fichiers CSV structurés..
 Ci-après le sujet du projet : (Rapport de projet C-Wire.pdf)
+
 ## Structure 
 
 - **`main.c`** : contient la fonction principale
