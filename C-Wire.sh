@@ -80,16 +80,18 @@ fi
 
 # Vérification de l'exécutable C
 
-executable="./C-Wire_pg" #explique le chemin et pour trouver l'executable qui se trouve dans le meme repertoire que le script shell
+executable="./exec" #explique le chemin et pour trouver l'executable qui se trouve dans le meme repertoire que le script shell
 if [ ! -f "$executable" ]; then #si l'executable n'existe pas
     echo "Compilation du programme C..."
-    make -C C-Wire # penser a appeler le makefile C-Wire 
+    make all # penser a appeler le makefile C-Wire 
     if [ $? -ne 0 ]; then # si le make a échouer on affiche une erreur 
         echo "Erreur : Échec de la compilation du programme C."
         echo "temps : 0.0sec"
         exit 7
     fi
+    echo "Compilation reussie"
 fi
+
 # on verfie que le fichier tmp n'existe pas et on le creer sinon ont le vide
 if [ ! -d "tmp" ]; then
     echo "Le dossier 'tmp' n'existe pas. Création."
@@ -154,7 +156,6 @@ fin=$(date +%s) #prend l'heure a la fin du filtrage
 duree=$((fin - debut)) # on fait la différence pour avoir le temps total d'execution
 echo "temps : $duree sec" # on affiche ce temps
 echo "FIN du script"
-
 
 
 
