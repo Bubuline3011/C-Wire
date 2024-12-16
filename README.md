@@ -1,4 +1,4 @@
-# Projet-INFO2 : CY-BER Path / Le Labyrinthe Magique
+# Projet-INFO2 : C-Wire
 ## Table des Matières
 1. [Description](#description)
 2. [Structure](#structure)
@@ -10,9 +10,9 @@
 
 Ce projet a pour objectif de développer une application qui analyse les données d'un système de distribution d'énergie en France, modélisé sous forme d'un réseau hiérarchique (arbre enraciné). Le projet est divisé en deux parties principales :
 Le programme permet de :
-   -  Filtrer les données en fonction du type de station (HVB, HVA, LV) et du type de consommateur (entreprise, particulier, ou tous).
+   - Filtrer les données en fonction du type de station (HVB, HVA, LV) et du type de consommateur (entreprise, particulier, ou tous).
    - Calculer la somme des consommations des stations et détecter les surcharges ou sous-utilisations grâce à un arbre AVL (arbre binaire équilibré).
-   -  Exporter les résultats dans des fichiers CSV structurés..
+   - Exporter les résultats dans des fichiers CSV structurés..
 
 ## Structure 
 
