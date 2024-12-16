@@ -1,5 +1,8 @@
 #!/bin/bash
 
+repertoire_pg="codeC"
+nom_exec="${repertoire_pg}/C-Wire"
+
 #Fonction pour aider l'utilisateur
 aide(){
 	echo "Le script premet de filtrer les donneés d'un fichier, crée un fichier qui contient une liste avec toutes les stations et d'autres inforations (somme des consommateurs etc)"
@@ -28,6 +31,7 @@ chemin_fichier=$1
 station=$2
 conso=$3
 id_centrale=$4
+nom_fichier_sortie=""
 
 if [ ! -f "$chemin_fichier" ]; then #verifier si le fichier existe
     echo "Erreur : fichier introuvable"
@@ -36,16 +40,16 @@ if [ ! -f "$chemin_fichier" ]; then #verifier si le fichier existe
     exit 2
 fi
 
-#verifier si le type de station  et le consommateur ecrit est valide
+#verifier si le type de station et le consommateur ecrit est valide
 
-if [[ "$station" != "hvb" && "$station" != "hva" && "$station" != "lv" ]]; then
+if [ $station != "hvb" ] && [ $station != "hva" ] && [ $station != "lv" ]; then
     echo "Erreur : La station n'existe pas. Valeurs possibles : hvb, hva, lv."
     aide
     echo "temps : 0.0sec"
     exit 3
 fi
 
-if [[ "$conso" != "comp" && "$conso" != "indiv" && "$conso" != "all" ]]; then
+if [ $conso != "comp" ] && [ $conso != "indiv" ] && [ $conso != "all" ]; then
     echo "Erreur : Le consommateur n'existe pas. Valeurs possibles : comp, indiv, all."
     aide
     exit 4
@@ -64,6 +68,16 @@ if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; th
     echo "temps : 0.0sec"
     exit 6
 fi
+
+if [ -z $id_centrale ]; then
+    id_centrale=-1
+fi
+
+if ! [[ $id_centrale =~ ^[1-5]$ ]] && [[ $id_centrale != -1 ]]; then
+  echo " L'identifiant de la centrale doit être un nombre positif entre 1 et 5"
+  exit 7
+fi
+
 
 # Vérification de l'exécutable C
 
@@ -96,7 +110,17 @@ fi
 
 debut=$(date +%s) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
 
-#filtrage
+#filtrage et autres
+
+if [ $id_centrale == -1 ]; then
+    ./$nom_exec $chemin_fichier $station $conso
+    nom_fichier_sortie="${station}_${conso}"
+else
+    ./$nom_exec $chemin_fichier $station $conso $id_centrale
+    nom_fichier_sortie="${station}_${conso}_${id_centrale}"
+fi
+
+#changer des trucs après
 
 filtre_centrale=""
 if [[ ! -z "$id_centrale" ]]; then
