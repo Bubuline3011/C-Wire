@@ -16,6 +16,7 @@ aide(){
     	echo "Options interdites :"
     	echo " hvb all, hvb indiv, hva all, hva indiv"
     	echo "  -h                 : Affiche cette aide et ignore tous les autres paramètres (optionnel)."
+     	exit 0
 } 
 
 if [[ "$#" -lt 3 ]] || [[ "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
