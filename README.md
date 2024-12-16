@@ -13,7 +13,11 @@ Le programme permet de :
    - Filtrer les données en fonction du type de station (HVB, HVA, LV) et du type de consommateur (entreprise, particulier, ou tous).
    - Calculer la somme des consommations des stations et détecter les surcharges ou sous-utilisations grâce à un arbre AVL (arbre binaire équilibré).
    - Exporter les résultats dans des fichiers CSV structurés..
-Ci-après le sujet du projet : (Rapport%20de%20projet%20C-Wire.pdf)
+
+Pour plus de détails sur le projet, consultez le rapport complet :
+
+[📄 Rapport de projet C-Wire](Rapport%20de%20projet%20C-Wire.pdf)
+
 
 ## Structure 
 
