@@ -9,9 +9,10 @@
 ## Description 
 
 Ce projet a pour objectif de développer une application qui analyse les données d'un système de distribution d'énergie en France, modélisé sous forme d'un réseau hiérarchique (arbre enraciné). Le projet est divisé en deux parties principales :
-
-   - Un script Shell : Pour filtrer et pré-traiter les données issues d'un fichier CSV volumineux contenant des informations sur la production et la consommation d'énergie des différentes stations.
-   - Un programme en langage C : Pour calculer la somme des consommations par station en utilisant un arbre AVL (arbre binaire de recherche équilibré) afin d'optimiser les performances et creér des fichiers de sortie.
+Le programme permet de :
+   -  Filtrer les données en fonction du type de station (HVB, HVA, LV) et du type de consommateur (entreprise, particulier, ou tous).
+   - Calculer la somme des consommations des stations et détecter les surcharges ou sous-utilisations grâce à un arbre AVL (arbre binaire équilibré).
+   -  Exporter les résultats dans des fichiers CSV structurés..
 
 ## Structure 
 
@@ -35,7 +36,7 @@ Consignes avant de pouvoir utiliser le projet  :
 1. Télécharger tous les fichiers en cliquant sur chacun, excepté le rapport de projet et le README.
 2. Mettre tous les fichiers dans un dossier si vous le souhaitez.
 3. Si vous l’avez mis dans un dossier, écrire : **cd nom_du_fichier**.
-4. Exécuter le script shell
+4. Exécuter le script shell. Syntaxe générale : ./C-Wire.sh <fichier_csv> <type_station> <type_consommateur> [id_centrale]
 5. Si vous avez besoin d'aide vous pouvez ecrire : **./C-Wire.sh -h**. Une page d'aide s'affichera alors.
 
 ## Auteurs
