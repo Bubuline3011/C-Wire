@@ -48,5 +48,5 @@ Consignes avant de pouvoir utiliser le projet  :
 
 - Bulard Yona - Initial Work - Bubuline3011
 - Kallel Ala - Initial Work - zquaddy
-- Attia Karin - Initial Work - attiakatin
+- Attia Karin - Initial Work - attiakarin
 
