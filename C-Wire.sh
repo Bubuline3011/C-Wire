@@ -31,7 +31,6 @@ chemin_fichier=$1
 station=$2
 conso=$3
 id_centrale=$4
-nom_fichier_sortie=""
 
 if [ ! -f "$chemin_fichier" ]; then #verifier si le fichier existe
     echo "Erreur : fichier introuvable"
@@ -111,16 +110,6 @@ fi
 debut=$(date +%s) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
 
 #filtrage et autres
-
-if [ $id_centrale == -1 ]; then
-    ./$nom_exec $chemin_fichier $station $conso
-    nom_fichier_sortie="${station}_${conso}"
-else
-    ./$nom_exec $chemin_fichier $station $conso $id_centrale
-    nom_fichier_sortie="${station}_${conso}_${id_centrale}"
-fi
-
-#changer des trucs après
 
 filtre_centrale=""
 if [[ ! -z "$id_centrale" ]]; then
