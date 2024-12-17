@@ -1,12 +1,11 @@
 #!/bin/bash
 
-repertoire_pg="codeC"
-nom_exec="${repertoire_pg}/C-Wire"
+chmod 777 C-Wire.sh
 
 #Fonction pour aider l'utilisateur
 aide(){
 	echo "Le script premet de filtrer les donneés d'un fichier, crée un fichier qui contient une liste avec toutes les stations et d'autres inforations (somme des consommateurs etc)"
-	echo " $0 <chemin_csv> <type_station> <type_conso> [<id_centrale>][-h]" # les crochets sont utilisés pour dire que largument est optionnel
+	echo " $0 <chemin_csv> <type_station> <type_conso> [<id_centrale>][-h]" # les crochets sont utilisés pour dire que l'argument est optionnel
 	echo "Paramètres :"
     	echo "  <chemin_csv>       : Chemin vers le fichier de données CSV (obligatoire)"
     	echo "  <type_station>     : Type de station à traiter : hvb, hva ou lv (obligatoire)"
@@ -22,8 +21,9 @@ aide(){
      	exit 0
 } 
 
-if [[ "$#" -lt 3 ]] || [[ "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
+if [[ "$#" -lt 3 || "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
 	aide
+	echo "temps : 0.0sec"
 	exit 1
 fi
 
@@ -109,7 +109,7 @@ else
     echo "Le dossier 'graphs' existe déjà."
 fi
 
-debut=$(date +%s) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
+debut=$(date +%s%N) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
 
 #filtrage et autres
 
@@ -152,9 +152,12 @@ sort -t';' -k5n tmp/lv_all.csv | tail -n 10 > lv_all_max.csv #tail permet d'affi
 # Pour les 10 moins chargés (min)
 sort -t';' -k5n tmp/lv_all.csv | head -n 10 > lv_all_min.csv #head permet d'afficher les premières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
 
-fin=$(date +%s) #prend l'heure a la fin du filtrage
-duree=$((fin - debut)) # on fait la différence pour avoir le temps total d'execution
+fin=$(date +%s%N) #prend l'heure a la fin du filtrage
+duree=$(( fin - debut )) # on fait la différence pour avoir le temps total d'execution
+seconde=$(echo "scale=6; $duree / 1000000000" | bc)  # Convertir en secondes avec 6 décimales
 echo "temps : $duree sec" # on affiche ce temps
+# Afficher le résultat
+printf "Temps d'exécution : %.6f secondes\n" "$seconde"
 echo "FIN du script"
 
 
