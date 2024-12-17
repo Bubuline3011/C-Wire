@@ -68,7 +68,7 @@ if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; th
     exit 6
 fi
 
-if [ -z $id_centrale ]; then
+if [ -z "$id_centrale" ]; then
     id_centrale=-1
 fi
 
@@ -109,55 +109,106 @@ else
     echo "Le dossier 'graphs' existe déjà."
 fi
 
-debut=$(date +%s%N) #sert a connaitre le temps d'execution : ici ça prend l'heure du début
+
 
 #filtrage et autres
 
-filtre_centrale=""
-if [[ ! -z "$id_centrale" ]]; then
-    filtre_centrale="&& \$1 == \"$id_centrale\""
+mesurer_temps() {  #sert a connaitre le temps d'execution
+    local temp_debut=$(date +%s.%N) # prend l'heure du début
+    "$@"
+    local temp_fin=$(date +%s.%N) # prend l'heure de fin
+    local temp_ecoule=$(awk "BEGIN {print $temp_fin - $temp_debut}") # on fait la différence pour avoir le temps total d'execution
+    printf "Temps d'exécution : %.3f sec\n" "$temp_ecoule"
+}
+
+# Fonction de filtrage
+filtrer_copier() {
+    local fichier_entrer="$1"
+    local station_type="$2"
+    local consommateur_type="$3"
+    local central_id="$4"
+    local fichier_sortie="tmp/donne_filtrer.dat"
+
+    echo "Filtrage des données en fonction du type de station, du type de consommateur et de l'ID de la centrale..."
+    
+# Déterminer les indices de colonnes en fonction du type de station
+    local station_index consommateur_index
+    case "$station_type" in
+        hvb) station_index=2 ;;
+        hva) station_index=3 ;;
+        lv) station_index=4 ;;
+    esac
+# Indices des colonnes en fonction du type de consommateur
+    case "$consommateur_type" in
+        comp) consommateur_index=5 ;;
+        indiv) consommateur_index=6 ;;
+        all) consommateur_index="all" ;;
+    esac
+
+    # En fonction du type de consommateur, définir les colonnes pour les filtrages
+    if [[ "$consommateur_index" == "all" ]]; then
+        # Si le type est "all", on ne filtre pas par consommateur
+        awk -v station_idx=$station_index -v central_id=$central_id 'BEGIN { FS=";"; OFS=";" } NR==1 || ($station_idx == central_id) { print $0 }' "$fichier_entrer" > "$fichier_sortie"
+    else
+        # Si un type spécifique est donné, on filtre également sur la colonne du consommateur
+        awk -v station_idx=$station_index -v cons_idx=$consommateur_index -v central_id=$central_id 'BEGIN { FS=";"; OFS=";" } NR==1 || ($station_idx == central_id && $cons_idx != "") { print $0 }' "$fichier_entrer" > "$fichier_sortie"
+    fi
+
+
+    echo "Données filtrées copiées dans : $fichier_sortie"
+}
+
+# Fonction pour calculer la différence de consommation
+calculer_diff_consommation() {
+    local fichier_entrer="$1"
+    local fichier_sortie="tmp/lv_all_minmax.csv"
+
+    echo "Calcul de la différence de consommation (capacité - consommation) et tri des 10 postes les plus et les moins chargés..."
+
+    awk -F';' 'NR > 1 { 
+        consommation = $5;
+        capacite = $7;
+        difference = capacite - consommation;
+        print $0 ";" difference
+    }' "$fichier_entrer" | sort -t';' -k8n | head -n 10 > "$fichier_sortie"
+
+    awk -F';' 'NR > 1 { 
+        consommation = $5;
+        capacite = $7;
+        difference = capacite - consommation;
+        print $0 ";" difference
+    }' "$fichier_entrer" | sort -t';' -k8n | tail -n 10 >> "$fichier_sortie"
+
+    echo "Les 10 postes les plus et les moins chargés ont été enregistrés dans : $fichier_sortie"
+}
+
+# Mesurer et exécuter le filtrage
+mesurer_temps filtrer_copier "$chemin_fichier" "$station" "$conso" "$id_centrale"
+
+# Vérification si lv_all.csv existe avant de tenter de le trier
+if [ ! -f "tmp/donne_filtrer.dat" ]; then
+    echo "Erreur : Le fichier filtré n'a pas été généré. Vérifiez le filtrage."
+    exit 8
 fi
 
-# Filtrage et traitement selon les paramètres
-if [[ "$station" == "hvb" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations hvb avec des entreprises, passer au programme C, et enregistrer dans hvb_comp.csv.
-    awk -F ';' "\$2 != \"-\" && \$4 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |
-        cut -d';' -f2,5,7,8 | tr '-' '0' | $executable > hvb_comp.csv
-    sort -t ':' -k2 -n hvb_comp.csv -o hvb_comp.csv #trier par ordre croissant
+# Si 'lv all', calculer la différence de consommation
+if [[ "$station" == "lv" && "$conso" == "all" ]]; then
+    calculer_diff_consommation "tmp/donne_filtrer.dat"
 fi
 
-if [[ "$station" == "hva" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations HVA avec entreprises, passer au programme C, et enregistrer dans hva_comp.csv.
-	awk -F ';' "\$3 != \"-\" && \$5 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f3,5,7,8 | tr '-' '0' | $executable > hva_comp.csv
-        sort -t ':' -k2 -n hva_comp.csv -o hva_comp.csv 
-fi
-
-if [[ "$station" == "lv" ]] && [[ "$conso" == "comp" ]]; then # Filtrer les données pour les stations LV avec des entreprises, passer au programme C, et enregistrer dans lv_comp.csv.
-	awk -F ';' "\$4 != \"-\" && \$5 == \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,5,7,8 | tr '-' '0' | $executable > lv_comp.csv
-	sort -t ':' -k2 -n lv_comp.csv -o lv_comp.csv
-fi
-
-if [[ "$station" == "lv" ]] && [[ "$conso" == "indiv" ]]; then # Filtrer les données pour les stations LV avec des consommateurs individuels, passer au programme C, et enregistrer dans lv_indiv.csv.
-	awk -F ';' "\$4 != \"-\" && \$6 != \"-\" && \$7 == \"-\" $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,6,7,8 | tr '-' '0' | $executable > lv_indiv.csv
-	sort -t ':' -k2 -n lv_indiv.csv -o lv_indiv.csv
-fi
-
-if [[ "$station" == "lv" ]] && [[ "$conso" == "all" ]]; then # Filtrer les données pour les stations LV avec tous les types de consommateurs (entreprises et particuliers), passer au programme C, et enregistrer dans tmp/lv_all.csv.
-	awk -F ';' "\$4 != \"-\" && (\$5 != \"-\" || \$6 != \"-\") $filtre_centrale" "$chemin_fichier" |cut -d';' -f4,5,6,7 | tr '-' '0' | $executable > tmp/lv_all.csv
-	sort -t ':' -k2 -n tmp/lv_all.csv -o tmp/lv_all.csv
+# Vérification si lv_all_minmax.csv existe avant de tenter de le trier
+if [ ! -f "tmp/lv_all_minmax.csv" ]; then
+    echo "Erreur : Le fichier lv_all_minmax.csv n'a pas été généré. Vérifiez le traitement."
+    exit 9
 fi
 
 # Trier les résultats pour les 10 postes les plus et les moins chargés
 # Pour les 10 plus chargés (max)
-sort -t';' -k5n tmp/lv_all.csv | tail -n 10 > lv_all_max.csv #tail permet d'afficher les dernières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
+sort -t';' -k5n tmp/lv_all.csv | tail -n 10 > graphs/lv_all_max.csv #tail permet d'afficher les dernières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
 
 # Pour les 10 moins chargés (min)
-sort -t';' -k5n tmp/lv_all.csv | head -n 10 > lv_all_min.csv #head permet d'afficher les premières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
+sort -t';' -k5n tmp/lv_all.csv | head -n 10 > graphs/lv_all_min.csv #head permet d'afficher les premières lignes du fichier lv_all_max car c'est trier dans l'ordre croissant 
 
-fin=$(date +%s%N) #prend l'heure a la fin du filtrage
-duree=$(( fin - debut )) # on fait la différence pour avoir le temps total d'execution
-seconde=$(echo "scale=6; $duree / 1000000000" | bc)  # Convertir en secondes avec 6 décimales
-echo "temps : $duree sec" # on affiche ce temps
-# Afficher le résultat
-printf "Temps d'exécution : %.6f secondes\n" "$seconde"
 echo "FIN du script"
 
 
