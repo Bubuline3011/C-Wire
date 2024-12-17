@@ -72,6 +72,22 @@ int max3(int a, int b, int c) {
     return max(max_ab, c);   // Comparer ce maximum avec `c`
 }
 
+//recuperer les donner de fichier et cree les station
+Station* creerStation(int id;int capacite,ont load,int centrale_id){
+Station *new=malloc(sizeof(Station));
+if(new==NULL){
+exit(3);
+}
+new->id=id;
+new->capacite=capacite;
+new->load=load;
+new->centrale_id=centrale_id;
+new->som_conso=0;
+return new;
+}
+
+
+
 // Fonction pour créer un arbre AVL avec une station donnée
 pavl creerAvl(Station * a){
 	if(a == NULL){
@@ -89,6 +105,8 @@ pavl creerAvl(Station * a){
 	noeud->equilibre = 0; //L'équilibre initial de l'arbre est 0 (arbre vide)
     	return noeud;
 }
+
+
 
 // Fonction d'insertion d'une station dans l'arbre AVL avec rééquilibrage
 pavl insertionAVL(pavl a, Station * e, int * h) {
@@ -320,8 +338,8 @@ void libérer_noeud_station(pavl noeud) {
 	free(noeud);	// Libérer le nœud courant
 }
 
-// Lecture des données CSV
-pavl lireFichierCSV(const char *nomFichier, pavl racine) {
+// Lecture des données CSV les donner qu'on va recuperer la on va l'utiliser pour creer station
+pavl lireFichierCSV(const char *nomFichier, pavl* racine) {
     FILE *f = fopen(nomFichier, "r");
     if (f == NULL) {
         perror("Erreur d'ouverture du fichier CSV");
@@ -330,9 +348,7 @@ pavl lireFichierCSV(const char *nomFichier, pavl racine) {
 
     char ligne[256];
     while (fgets(ligne, sizeof(ligne), f)) {
-        Station * s = malloc(sizeof(Station));
-        if(s == NULL){
-        	exit(5);
+          
         }
         if (sscanf(ligne, "%d;%d;%d", &s->id, &s->capacite, &s->load) == 3) {
             int h = 0;
@@ -345,6 +361,9 @@ pavl lireFichierCSV(const char *nomFichier, pavl racine) {
     fclose(f);
     return racine;
 }
+
+
+//faire une fonction qui parcours l'avl et creer un fichier ou les capacite soit trirer en ordre croissant
 
 // Programme principal
 int main(int argc, char *argv[]) {
@@ -366,6 +385,18 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
