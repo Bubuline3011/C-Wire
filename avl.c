@@ -6,7 +6,7 @@ pavl creerAvl(Station * a){
 		printf("Erreur");
 		exit(1);
 	}
-	pavl noeud = malloc(sizeof(pavl)); // Allocation dynamique pour un nouvel arbre AVL
+	pavl noeud = malloc(sizeof(Avl)); // Allocation dynamique pour un nouvel arbre AVL
 	if(noeud==NULL){
    		exit(2); //Allocation échouée
    	}
