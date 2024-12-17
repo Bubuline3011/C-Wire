@@ -31,13 +31,14 @@ pavl rotationGauche(pavl a);
 pavl rotationDroite(pavl a);
 pavl doubleRotationDroite(pavl a);
 pavl doubleRotationGauche(pavl a);
-pavl equilibreAVL(pavl * a);
+pavl equilibreAVL(pavl a);
 pavl insertionAVL(pavl a, Station * e, int * h);
-pavl suppMinAVL(pavl* a, int * h, int * pe);
-pavl suppressionAVL(pavl * a, int * h, int e);
+pavl suppMinAVL(pavl a, int * h, int * pe);
+pavl suppressionAVL(pavl a, int * h, Station * e);
 void sommeConso(pavl a);
 void ecrireFichierSortie(const char *nomFichier, pavl a);
-void libererAVL(pavl a);
+void ecrireFichierSortieRec(pavl a, FILE *f);
+void libérer_noeud_station(pavl noeud);
 pavl lireFichierCSV(const char *nomFichier, pavl racine);
 
 
@@ -78,7 +79,7 @@ pavl creerAvl(Station * a){
 		exit(1);
 	}
 	pavl noeud = malloc(sizeof(pavl)); // Allocation dynamique pour un nouvel arbre AVL
-	if(arbre==NULL){
+	if(noeud==NULL){
    		exit(2); //Allocation échouée
    	}
 	 // Attribution de tous les champ a notre nouveau noeud de l'AVL
@@ -103,13 +104,13 @@ pavl insertionAVL(pavl a, Station * e, int * h) {
         	a->fd = insertionAVL(a->fd, e, h); // Insertion récursive dans le sous-arbre droit
     	} 
     	else {                            // Si la station est déjà présente, on ne l'insère pas
-    		a->station->load = a->station>load + a->load;
+    		//a->station->load = a->station->load + a->load; //changer la ligne 
         	*h = 0;
         	return a;
     	}
 	if (*h != 0) {                     // Si l'équilibre n'est pas nul
         	a->equilibre = a->equilibre + *h;            // Ajuster l'équilibre de l'arbre
-        	a = equilibrerAVL(a);          // Équilibrer l'arbre après insertion
+        	a = equilibreAVL(a);          // Équilibrer l'arbre après insertion
         	if (a->equilibre == 0) {              // Si l'arbre est équilibré après insertion
             		*h = 0;
         	}
@@ -120,23 +121,23 @@ pavl insertionAVL(pavl a, Station * e, int * h) {
     	return a;
 }
 
-pavl recherche(pavl noeud, int id) {
-    	if (noeud == NULL)
+int recherche(pavl noeud, int id) {
+    	if (noeud == NULL){
     		return 0;
 	}
-	else if(a->id == e){
+	else if(noeud->station->id == id){
         	return 1;
     	}
-    	if (id < noeud->id) {
+    	if (id < noeud->station->id) {
         	return recherche(noeud->fg, id);
     	} 
-    	else if (id > root->id) {
+    	else if (id > noeud->station->id) {
         	return recherche(noeud->fd, id);
     	} 
 }
 
 void parcoursInfixe(pavl a){
-	if(a != NULL)
+	if(a != NULL){
 		parcoursInfixe(a->fg);
 		printf("(Id : %d, Capacite : %d, Load : %d, Equilibre : %d, Somme : %d)", a->station->id, a->station->capacite, a->station->load, a->equilibre, a->station->som_conso);
 		parcoursInfixe(a->fd);
@@ -146,31 +147,31 @@ void parcoursInfixe(pavl a){
 
 // Fonction de rotation à gauche pour rééquilibrer l'arbre AVL
 pavl rotationGauche(pavl a) {  	
-    	AVL * pivot;
-    	int eq_a, aq_p;
+    	pavl pivot;
+    	int eq_a, eq_p;
     	pivot = a->fd; // Le fils droit devient le pivot
     	a->fd = pivot->fg; // Le sous-arbre gauche du pivot devient le fils droit de `a`
     	pivot->fg = a; //`a` devient le fils gauche du pivot
     	eq_a = a->equilibre;
     	eq_p = pivot->equilibre;
     	// Mise à jour des facteurs d'équilibre
-    	a->equilbre = eq_a - max(eq_p, 0) - 1;
-    	pivot->equilibre = min(eq_a -2, eq_a + eq_p -2, eq_p -1);
+    	a->equilibre = eq_a - max(eq_p, 0) - 1;
+    	pivot->equilibre = min3(eq_a -2, eq_a + eq_p -2, eq_p -1);
     	a = pivot; // Le pivot devient la nouvelle racine
     	return a;
 }
 
 // Fonction de rotation à droite pour rééquilibrer l'arbre AVL
 pavl rotationDroite(pavl a) {
-    	AVL * pivot;
-    	int eq_a, aq_p;
+    	pavl  pivot;
+    	int eq_a, eq_p;
     	pivot = a->fg; // Le fils gauche devient le pivot
     	a->fg = pivot->fd; // Le sous-arbre droit du pivot devient le fils gauche de `a`
     	pivot->fd = a; //`a` devient le fils droit du pivot
     	eq_a = a->equilibre;
     	eq_p = pivot->equilibre;
     	// Mise à jour des facteurs d'équilibre
-    	a->equilbre = eq_a - min(eq_p, 0) + 1;
+    	a->equilibre = eq_a - min(eq_p, 0) + 1;
     	pivot->equilibre = min3(eq_a +2, eq_a + eq_p +2, eq_p +1);
     	a = pivot; // Le pivot devient la nouvelle racine
     	return a;
@@ -188,13 +189,13 @@ pavl doubleRotationGauche(pavl a) {
     	return rotationGauche(a);       // Ensuite, effectuer une rotation à gauche
 }
 
-pavl equilibreAVL(pavl * a){
+pavl equilibreAVL(pavl a){
     if(a->equilibre >= 2){ // sous-arbre droit plus profond
-        if(a->fd->equilibre>= 0){
+        if(a->fd->equilibre >= 0){
             return rotationGauche(a);
         }
         else {
-            return doublerotationGauche(a);
+            return doubleRotationGauche(a);
         }
     }
     else if(a->equilibre <= -2){ // sous-arbre gauche plus profond
@@ -202,14 +203,14 @@ pavl equilibreAVL(pavl * a){
             return rotationDroite(a);
         }
         else {
-            return doublerotationDroite(a);
+            return doubleRotationDroite(a);
         }
     }
     return a;
 }
 
-pavl suppMinAVL(pavl* a, int * h, int * pe){
-    	AVL * tmp;
+pavl suppMinAVL(pavl a, int * h, int * pe){
+    	pavl tmp;
     	if(a->fg == NULL){
         	*pe = a->station->id;
         	*h = -1;
@@ -219,7 +220,7 @@ pavl suppMinAVL(pavl* a, int * h, int * pe){
         	return a;
     	}
     	else {
-        	a->fg = suppMinAVL(a->fg, h, pe):
+        	a->fg = suppMinAVL(a->fg, h, pe);
    	}
     	if(*h != 0){
         	a->equilibre = a->equilibre + *h;
@@ -234,18 +235,18 @@ pavl suppMinAVL(pavl* a, int * h, int * pe){
     	return a;
 }
 
-pavl suppressionAVL(pavl * a, int * h, int e){
-	pavl * tmp;
+pavl suppressionAVL(pavl a, int * h, Station * e){
+	pavl tmp;
     	if(a == NULL){
         	*h = 0;
         	return a;
     	}
     	else if(e->id < a->station->id){
-        	a->fg = suppressionAVL(a->fg, e);
+        	a->fg = suppressionAVL(a->fg, h, e);
         	*h = -*h;
     	}
     	else if(e->id > a->station->id){
-        	a->fd = suppressionAVL(a->fd, e);
+        	a->fd = suppressionAVL(a->fd,h, e);
     	}
     	else if(a->fd != NULL){
         	a->fd = suppMinAVL(a->fd, h, &a->station->id);
@@ -309,13 +310,13 @@ void ecrireFichierSortieRec(pavl a, FILE *f) {
 }
 
 // Libération de la mémoire de l'AVL
-void libérer_noeud_station(StationNode *noeud) {
+void libérer_noeud_station(pavl noeud) {
     	if (noeud == NULL){// Si le nœud est NULL, on ne fait rien
     		return;
 	}
-    	libérer_noeud_station(noeud->gauche); // Libérer le sous-arbre gauche
-    	libérer_noeud_station(noeud->droit);// Libérer le sous-arbre droit
-    	free(a->station);
+    	libérer_noeud_station(noeud->fg); // Libérer le sous-arbre gauche
+    	libérer_noeud_station(noeud->fd);// Libérer le sous-arbre droit
+    	free(noeud->station);
 	free(noeud);	// Libérer le nœud courant
 }
 
@@ -361,7 +362,7 @@ int main(int argc, char *argv[]) {
     sommeConso(racine);
     ecrireFichierSortie(fichierSortie, racine);
 
-    libererAVL(racine);
+    libérer_noeud_station(racine);
 
     return 0;
 }

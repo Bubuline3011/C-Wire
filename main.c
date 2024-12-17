@@ -1,5 +1,6 @@
 #include "projet.h"
 
+// Programme principal
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <fichier_csv_entree> <fichier_csv_sortie>\n", argv[0]);
@@ -15,7 +16,7 @@ int main(int argc, char *argv[]) {
     sommeConso(racine);
     ecrireFichierSortie(fichierSortie, racine);
 
-    libererAVL(racine);
+    libérer_noeud_station(racine);
 
     return 0;
 }

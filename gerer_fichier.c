@@ -23,7 +23,6 @@ void ecrireFichierSortieRec(pavl a, FILE *f) {
     	ecrireFichierSortieRec(a->fd, f);
 }
 
-
 // Lecture des données CSV
 pavl lireFichierCSV(const char *nomFichier, pavl racine) {
     FILE *f = fopen(nomFichier, "r");
