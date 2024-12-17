@@ -18,6 +18,19 @@ pavl creerAvl(Station * a){
     	return noeud;
 }
 
+Station * creerStation(int id;int capacite,ont load,int centrale_id){
+	Station *new=malloc(sizeof(Station));
+	if(new==NULL){
+		exit(3);
+	}
+	new->id=id;
+	new->capacite=capacite;
+	new->load=load;
+	new->centrale_id=centrale_id;
+	new->som_conso=0;
+	return new;
+}
+
 // Fonction d'insertion d'une station dans l'arbre AVL avec rééquilibrage
 pavl insertionAVL(pavl a, Station * e, int * h) {
     	if (a == NULL) {
