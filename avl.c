@@ -6,7 +6,7 @@ pavl creerAvl(Station * a){
 		printf("Erreur");
 		exit(1);
 	}
-	pavl noeud = malloc(sizeof(Avl)); // Allocation dynamique pour un nouvel arbre AVL
+	pavl noeud = malloc(sizeof(AVL)); // Allocation dynamique pour un nouvel arbre AVL
 	if(noeud==NULL){
    		exit(2); //Allocation échouée
    	}
@@ -18,7 +18,7 @@ pavl creerAvl(Station * a){
     	return noeud;
 }
 
-Station * creerStation(int id;int capacite,ont load,int centrale_id){
+Station * creerStation(int id,int capacite,int load,int centrale_id){
 	Station *new=malloc(sizeof(Station));
 	if(new==NULL){
 		exit(3);
@@ -26,7 +26,7 @@ Station * creerStation(int id;int capacite,ont load,int centrale_id){
 	new->id=id;
 	new->capacite=capacite;
 	new->load=load;
-	new->centrale_id=centrale_id;
+	new->id=centrale_id;
 	new->som_conso=0;
 	return new;
 }
