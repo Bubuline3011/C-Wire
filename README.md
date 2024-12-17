@@ -38,9 +38,9 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 ## Utilisation
 
 Consignes avant de pouvoir utiliser le projet  : 
-1. Télécharger tous les fichiers en cliquant sur chacun, excepté le rapport de projet et le README.
-2. Mettre tous les fichiers dans un dossier si vous le souhaitez.
-3. Si vous l’avez mis dans un dossier, écrire : **cd nom_du_fichier**.
+1. Télécharger le dossier en cliquant sur "code", puis "Download Zip".
+2. Extraire le dossier.
+3. Ecrire dans le terminal : **cd nom_du_fichier**.
 4. Exécuter le script shell. Syntaxe générale : **./C-Wire.sh <fichier_csv> <type_station> <type_consommateur> [id_centrale]**
 5. Si vous avez besoin d'aide vous pouvez ecrire : **./C-Wire.sh -h**. Une page d'aide s'affichera alors.
 
