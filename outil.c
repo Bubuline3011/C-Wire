@@ -1,6 +1,5 @@
 #include "projet.h"
 
-
 // Fonction pour renvoyer le maximum entre deux valeurs
 int max(int a, int b) {
     if (a > b) {
@@ -30,3 +29,4 @@ int max3(int a, int b, int c) {
     int max_ab = max(a, b);  // Trouver le maximum entre `a` et `b`
     return max(max_ab, c);   // Comparer ce maximum avec `c`
 }
+
