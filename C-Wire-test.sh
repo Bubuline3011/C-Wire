@@ -181,6 +181,13 @@ if [ ! -f "$executable" ]; then #si l'executable n'existe pas
     echo "Compilation reussie"
 fi
 
+fichier_tmp_result="tmp/fichier_tmp_result"
+
+cp "$fichier_tmp_result" "$fichier_sortie" #copie le fichier temporaire avec les resultats dans le fichier de sortie
+rm "$fichier_tmp_result"
+
+echo "Fichier temporaire copié vers le fichier final : $fichier_sortie"
+
 if [ -e lv_all.csv ]; then
 	# Calculer la différence (Capacité - Consommation) et trier
 	awk -F';' -v OFS=';' \
