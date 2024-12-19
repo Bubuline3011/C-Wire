@@ -1,50 +1,66 @@
 #include "projet.h"
 
-// Écriture des résultats dans un fichier de sortie
-void ecrireFichierSortie(const char *nomFichier, pavl a) {
-    	FILE *f = fopen(nomFichier, "w");
-    	if (f == NULL) {
-        	perror("Erreur d'ouverture du fichier de sortie");
-        	exit(3);
-    	}
-    	fprintf(f, "ID;Capacité;Consommation\n");
-    	if (a != NULL) {
-        	ecrireFichierSortieRec(a, f);
-    	}
-    	fclose(f);
-}
-
-void ecrireFichierSortieRec(pavl a, FILE *f) {
-    	if (a == NULL){
-		return;
+void recuperer_info_csv(pavl * a){ // certaine fonction utilisée ici ont été trouvé sur internet mais compris par l'ensemble des membres du groupe
+	if(a != NULL){
+		printf("Erreur : L'arbre n'est pas vide");
+		exit(12);
 	}
-    	ecrireFichierSortieRec(a->fg, f);
-    	fprintf(f, "%d:%d:%d\n", a->station->id, a->station->capacite, a->station->som_conso);
-    	ecrireFichierSortieRec(a->fd, f);
+	FILE * f = NULL;
+	f = fopen("tmp/donnees_filtrees.csv", "r"); // ouvir le fichier temporaire avec les données filtrées
+	if(f == NULL){
+		printf("Ouverture du fichier impossible\n");
+		printf("code d'erreur = %d \n", errno );
+		printf("Message d'erreur = %s \n", strerror(errno));
+		exit(15);
+	}
+	int h = 0;
+	char ligne[MAX_LIGNE];
+	while(fgets(ligne, sizeof(ligne), f)){
+		ligne[strcspn(ligne, "\n")] =0; 
+		char * colonne1 = strtok(ligne, ";"); //strtok sert a couper la ligne en 3
+		char * colonne2 = strtok(NULL, ";");  
+        	char * colonne3 = strtok(NULL, ";");
+        	if (colonne1 == NULL || colonne2 == NULL || colonne3 == NULL) {
+            		printf("Erreur : Ligne mal formatée dans le fichier\n");
+            		continue; // Ignorer la ligne mal formatée
+        	}
+        	// Convertir les colonnes en entiers
+        	int id = atoi(colonne1);
+        	int capacite = atoi(colonne2);
+        	int conso = atoi(colonne3);
+        	// Insérer les données dans l'arbre AVL
+        	*a = insertionAVL(*a, id, capacite, conso, &h);
+        }
+	fclose(f);
+}
+	
+void parcoursInfixe(pavl a, FILE* f){
+	if(f == NULL){
+		printf("Le fichier n'existe pas");
+		exit(18);
+	}
+	if(a != NULL){ // si a est NULL pas besoin d'ecrire dans le fichier
+		parcoursInfixe(a->fg, f);
+		fprintf(f, "%d:", a->station->id);
+		fprintf(f, "%d:", a->station->capacite);
+		fprintf(f, "%d\n", a->station->conso);
+		parcoursInfixe(a->fd, f);
+	}
 }
 
-// Lecture des données CSV
-pavl lireFichierCSV(const char *nomFichier, pavl racine) {
-    FILE *f = fopen(nomFichier, "r");
-    if (f == NULL) {
-        perror("Erreur d'ouverture du fichier CSV");
-        exit(4);
-    }
-
-    char ligne[256];
-    while (fgets(ligne, sizeof(ligne), f)) {
-        Station * s = malloc(sizeof(Station));
-        if(s == NULL){
-        	exit(5);
-        }
-        if (sscanf(ligne, "%d;%d;%d", &s->id, &s->capacite, &s->load) == 3) {
-            int h = 0;
-            racine = insertionAVL(racine, s, &h);
-        }
-        else {
-            free(s);
-        }
-    }
-    fclose(f);
-    return racine;
+void ecrire_ds_fichier_result_tmp(pavl a){ 
+	if(a == NULL){
+		printf("L'arbre n'a pas été crée");
+		exit(8);
+	}
+	FILE * f = fopen("tmp/fichier_tmp_result", "w");// Le mode 'w' permet d'écraser les données précédentes dans le fichier temporaire de resultat
+	if(f == NULL){
+		printf("Ouverture du fichier impossible\n");
+		printf("code d'erreur = %d \n", errno );
+		printf("Message d'erreur = %s \n", strerror(errno));
+		exit(16);
+	}
+	parcoursInfixe(a, f);
+	fclose(f);
 }
+
