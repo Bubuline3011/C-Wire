@@ -1,6 +1,6 @@
 #include "projet.h"
 
-void recuperer_info_csv(pavl * a){ // certaine fonction utilisée ici ont été trouvé sur internet mais compris par l'ensemble des membres du groupe
+void recuperer_info_csv(pavl * a){
 	if(a != NULL){
 		printf("Erreur : L'arbre n'est pas vide");
 		exit(12);
