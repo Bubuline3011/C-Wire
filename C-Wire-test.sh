@@ -19,6 +19,8 @@ aide(){
      	exit 0
 } 
 
+#Verification des arguments
+
 if [[ "$#" -lt 3 || "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
 	aide
 	echo "temps : 0.0sec"
@@ -168,23 +170,30 @@ temp_ecoule=$(awk "BEGIN {print $temp_fin - $temp_debut}") # on fait la différe
 printf "Temps d'exécution : %.3f sec\n" "$temp_ecoule"
 
 # Vérification de l'exécutable C
-
-executable="./exec" #explique le chemin et pour trouver l'executable qui se trouve dans le meme repertoire que le script shell
-if [ ! -f "$executable" ]; then #si l'executable n'existe pas
+touch tmp/fichier_tmp_result # Crée un fichier vide nommé fichier_tmp_result dans tmp
+executable="./codeC/exec" # L'exécutable est dans le dossier codeC
+if [ ! -x "$executable" ]; then # Si le fichier est executable
     echo "Compilation du programme C..."
-    make all # penser a appeler le makefile C-Wire 
-    if [ $? -ne 0 ]; then # si le make a échouer on affiche une erreur 
+    make -C codeC all # Exécute le Makefile dans le dossier codeC
+    if [ $? -ne 0 ]; then # Si la compilation échoue, on affiche une erreur
         echo "Erreur : Échec de la compilation du programme C."
         echo "temps : 0.0sec"
         exit 7
     fi
-    echo "Compilation reussie"
+    echo "Compilation réussie"
 fi
 
-fichier_tmp_result="tmp/fichier_tmp_result"
+fichier_result="tmp/fichier_tmp_result"
 
-cat "$fichier_tmp_result" >> "$fichier_sortie" #copie le fichier temporaire avec les resultats dans le fichier de sortie
-rm "$fichier_tmp_result"
+if [ -f "$fichier_result" ]; then
+    cat "$fichier_result" >> "$fichier_sortie" # Ajoute au fichier de sortie
+    rm "$fichier_result"                      # Supprime le fichier temporaire
+    echo "Fichier temporaire traité avec succès."
+else
+    echo "Erreur : Le fichier temporaire '$fichier_result' est introuvable ou vide."
+    exit 9
+fi
+
 
 echo "Fichier temporaire copié vers le fichier final : $fichier_sortie"
 
