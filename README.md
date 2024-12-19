@@ -42,7 +42,7 @@ Consignes avant de pouvoir utiliser le projet  :
 2. Extraire le dossier.
 3. Ecrire dans le terminal : **cd nom_du_fichier**.
 4. Pour rendre le fichier executable, ecrire : **chmod +x C-Wire.sh**
-5. Exécuter le script shell. Syntaxe générale : **./C-Wire.sh <fichier_csv> <type_station> <type_consommateur> [id_centrale]**
+5. Exécuter le script shell. Syntaxe générale : **./C-Wire.sh input/<fichier_csv> <type_station> <type_consommateur> [id_centrale]**
 6. Si vous avez besoin d'aide vous pouvez ecrire : **./C-Wire.sh -h**. Une page d'aide s'affichera alors.
 
 ## Auteurs
