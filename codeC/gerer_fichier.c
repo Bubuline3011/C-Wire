@@ -101,21 +101,3 @@ void ecrire_ds_fichier_result_tmp(pavl a){
 	fclose(f);
 }
 
-
-void ecrire_ds_fichier_result_tmp(pavl a){ 
-	if(a == NULL){
-		printf("L'arbre n'a pas été crée\n");
-		exit(8);
-	}
-	FILE * f = fopen("tmp/fichier_tmp_result.csv", "w");// Le mode 'w' permet d'écraser les données précédentes dans le fichier temporaire de resultat
-	if(f == NULL){
-		printf("Ouverture du fichier impossible\n");
-		printf("code d'erreur = %d \n", errno );
-		printf("Message d'erreur = %s \n", strerror(errno));
-		exit(16);
-	}
-	parcoursInfixe(a, f);
-	printf("Écriture dans le fichier temporaire terminée.\n");
-	fclose(f);
-}
-
