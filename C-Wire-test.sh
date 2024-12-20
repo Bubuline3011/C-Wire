@@ -170,10 +170,11 @@ temp_ecoule=$(awk "BEGIN {print $temp_fin - $temp_debut}") # on fait la différe
 printf "Temps d'exécution : %.3f sec\n" "$temp_ecoule"
 
 # Vérification de l'exécutable C
-touch tmp/fichier_tmp_result # Crée un fichier vide nommé fichier_tmp_result dans tmp
+touch tmp/fichier_tmp_result.csv # Crée un fichier vide nommé fichier_tmp_result dans tmp
 executable="./codeC/exec" # L'exécutable est dans le dossier codeC
 if [ ! -x "$executable" ]; then # Si le fichier est executable
     echo "Compilation du programme C..."
+    make -C codeC clean # Nettoie les fichiers précédents
     make -C codeC all # Exécute le Makefile dans le dossier codeC
     if [ $? -ne 0 ]; then # Si la compilation échoue, on affiche une erreur
         echo "Erreur : Échec de la compilation du programme C."
@@ -183,12 +184,17 @@ if [ ! -x "$executable" ]; then # Si le fichier est executable
     echo "Compilation réussie"
 fi
 
-fichier_result="tmp/fichier_tmp_result"
+if [ ! -f "tmp/fichier_tmp_result.csv" ]; then
+    echo "Erreur : Le fichier 'tmp/fichier_tmp_result.csv' n'a pas été créé."
+    exit 1
+fi
 
-if [ -f "$fichier_result" ]; then
+fichier_result="tmp/fichier_tmp_result.csv"
+
+if [ -s "$fichier_result" ]; then
     cat "$fichier_result" >> "$fichier_sortie" # Ajoute au fichier de sortie
-    rm "$fichier_result"                      # Supprime le fichier temporaire
-    echo "Fichier temporaire traité avec succès."
+    #rm "$fichier_result"                      # Supprime le fichier temporaire
+    echo "Fichier temporaire traité avec succès et ajouté a $fichier_sortie."
 else
     echo "Erreur : Le fichier temporaire '$fichier_result' est introuvable ou vide."
     exit 9
