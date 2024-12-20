@@ -157,8 +157,13 @@ esac
 grep -E "$filtre" "tmp/centrale_filtrees.csv" | cut -d ';' -f $colonnes | tr '-' '0' > "tmp/donnees_filtrees.csv"
 
 # Vérification après écriture
+if [ ! -f "tmp/donnees_filtrees.csv" ]; then
+    echo "Erreur : Le fichier tmp/donnees_filtrees.csv n'a pas été généré. Arrêt."
+    exit 1
+fi
 
-if [ ! -s tmp/donnees_filtrees.csv ]; then
+
+if [ ! -s "tmp/donnees_filtrees.csv" ]; then
     echo "Erreur : Aucune donnée filtrée."
     exit 13
 fi
@@ -170,7 +175,7 @@ temp_ecoule=$(awk "BEGIN {print $temp_fin - $temp_debut}") # on fait la différe
 printf "Temps d'exécution : %.3f sec\n" "$temp_ecoule"
 
 # Vérification de l'exécutable C
-touch tmp/fichier_tmp_result.csv # Crée un fichier vide nommé fichier_tmp_result dans tmp
+#touch tmp/fichier_tmp_result.csv # Crée un fichier vide nommé fichier_tmp_result dans tmp
 executable="./codeC/exec" # L'exécutable est dans le dossier codeC
 if [ ! -x "$executable" ]; then # Si le fichier est executable
     echo "Compilation du programme C..."
@@ -182,6 +187,14 @@ if [ ! -x "$executable" ]; then # Si le fichier est executable
         exit 7
     fi
     echo "Compilation réussie"
+fi
+
+# Exécution de l'exécutable
+echo "Exécution de l'exécutable C..."
+"$executable"
+if [ $? -ne 0 ]; then
+    echo "Erreur : L'exécution de l'exécutable a échoué."
+    exit 8
 fi
 
 if [ ! -f "tmp/fichier_tmp_result.csv" ]; then
@@ -239,18 +252,37 @@ if [ -e "lv_all_$id_centrale.csv" ]; then
 	rm -f "tmp/lv_all_sorted_$id_centrale.csv" "tmp/lv_all_min_$id_centrale.csv" "tmp/lv_all_max_$id_centrale.csv"
 fi
 
+#Partie bonus :
+# Vérifier si Gnuplot est installé
+if ! command -v gnuplot &> /dev/null; then
+    echo "Erreur : Gnuplot n'est pas installé."
+    exit 1
+fi
+
+# Génération du graphique
+gnuplot << gnuplot
+	set terminal png size 800,600
+	set output "graphs/bonus.png"
+	set title "Postes LV - Consommation et Capacité"
+	set xlabel "Station"
+	set ylabel "Différence (Capacité - Consommation)"
+	set grid
+	set style data histogram
+	set style histogram cluster gap 1
+	set style fill solid 1.00 border -1
+	set boxwidth 0.75
+	set xtics rotate by -45
+	set key outside
+
+# Définir les couleurs pour les barres
+	set palette model RGB defined ( 0 "green", 1 "red" )
+
+plot "$fichier_sortie" using 2:xtic(1) linecolor palette frac (column(2)<0?1:0) with boxes
+gnuplot
+#ecrire : si il existe lv_all_minmax.csv on fait le trux en dessous et pareill pour lv_all_minmax_$id_centrale.csv
+echo "Graphique généré : graphs/bonus.png"
+
+make clean
+
 echo "FIN du script"
-
-
-
-
-
-
-
-
-
-
-
-
-
 
