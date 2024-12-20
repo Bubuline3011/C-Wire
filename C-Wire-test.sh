@@ -19,7 +19,7 @@ aide(){
      	exit 0
 } 
 
-#Verification des arguments
+#Verification des arguments si le nombre d'argument est insuiffisant ou faut affichier la fonction d'aide
 
 if [[ "$#" -lt 3 || "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque soit l'endroit ou si le nombre d'argument est inferieur a trois 
 	aide
@@ -27,10 +27,14 @@ if [[ "$#" -lt 3 || "$*" == *"-h"* ]]; then #si l'option -h est demandé quelque
 	exit 1
 fi
 
+#Initialisation des paramètres en fonction des arguments fournis
+
 chemin_fichier=$1
 station=$2
 conso=$3
 id_centrale=$4
+
+# Vérification si le fichier existe
 
 if [ ! -f "$chemin_fichier" ]; then #verifier si le fichier existe
     echo "Erreur : fichier introuvable"
@@ -48,6 +52,7 @@ if [ $station != "hvb" ] && [ $station != "hva" ] && [ $station != "lv" ]; then
     exit 3
 fi
 
+# Vérification de la validité du type de consommateur
 if [ $conso != "comp" ] && [ $conso != "indiv" ] && [ $conso != "all" ]; then
     echo "Erreur : Le consommateur n'existe pas. Valeurs possibles : comp, indiv, all."
     aide
@@ -61,6 +66,8 @@ if [[ "$station" == "hvb" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; th
     echo "temps : 0.0sec"
     exit 5
 fi
+
+# Vérifications des restrictions spécifiques
 if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; then
     echo "Erreur : Les options 'hva all' et 'hva indiv' sont interdites."
     aide
@@ -68,10 +75,12 @@ if [[ "$station" == "hva" && ( "$conso" == "all" || "$conso" == "indiv" ) ]]; th
     exit 6
 fi
 
+# Si aucun identifiant de centrale n'est fourni, on attribue une valeur par défaut (-1)
 if [ -z "$id_centrale" ]; then
     id_centrale=-1
 fi
 
+# Validation de l'identifiant de la centrale
 if ! [[ $id_centrale =~ ^[1-5]$ ]] && [[ $id_centrale != -1 ]]; then
   echo " L'identifiant de la centrale doit être un nombre positif entre 1 et 5"
   exit 8
@@ -82,12 +91,14 @@ if [ ! -d "tmp" ]; then
     echo "Le dossier 'tmp' n'existe pas. Création."
     mkdir -p tmp
 else
+# vider le dossier tmp s'il existe
     echo "Le dossier 'tmp' existe déjà. On le vide"
     rm -rf tmp/* #surprime tout ce qui est a l'interieur  
 fi
 
 # on verfie que le fichier graph n'existe pas et on le creer 
 if [ ! -d "graphs" ]; then
+# Création du dossier graphs s'il n'existe pas
     echo "Le dossier 'graphs' n'existe pas. Création."
     mkdir -p graphs
 else
@@ -102,14 +113,15 @@ else
     fichier_sortie="${station}_${conso}_${id_centrale}.csv"
 fi
 
+# Ajout de l'en-tête au fichier de sortie
 echo "Station $station;Capacité;Consommation" > "$fichier_sortie"
 
 #filtrage et autres
-
 temp_debut=$(date +%s.%N) # prend l'heure du début
 
 echo "Filtrage des données en cours...."
 
+# Vérification de l'accès en écriture dans le dossier temporaire
 if [ ! -w /tmp ]; then
     echo "Erreur : Pas de permission pour écrire dans /tmp."
     exit 10
@@ -120,8 +132,7 @@ echo "Station est : $conso"
 echo "fichier est : $chemin_fichier"
 
 
-# Filtrage des données en fonction des paramètres 
-#Filtrage par numéro de centrale si il y'en a une 
+#Filtrage par numéro de centrale si si applicable
 if [[ "$id_centrale" -ne -1 ]]; then
     grep -E "^$id_centrale;" "$chemin_fichier" > "tmp/centrale_filtrees.csv"
 
@@ -130,6 +141,7 @@ if [[ "$id_centrale" -ne -1 ]]; then
         exit 13
     fi
 else 
+#Si aucun identifiant de centrale n'est spécifié
     cp "$chemin_fichier" "tmp/centrale_filtrees.csv"
 fi
 #Filtrage par station et consommateur
@@ -154,9 +166,10 @@ case "$station-$conso" in
         exit 7 ;;
 esac
 
+# Application du filtre et extraction des colonnes pertinentes
 grep -E "$filtre" "tmp/centrale_filtrees.csv" | cut -d ';' -f $colonnes | tr '-' '0' > "tmp/donnees_filtrees.csv"
 
-# Vérification après écriture
+# Vérification de la réussite du filtrage
 if [ ! -f "tmp/donnees_filtrees.csv" ]; then
     echo "Erreur : Le fichier tmp/donnees_filtrees.csv n'a pas été généré. Arrêt."
     exit 1
@@ -175,12 +188,15 @@ temp_ecoule=$(awk "BEGIN {print $temp_fin - $temp_debut}") # on fait la différe
 printf "Temps d'exécution : %.3f sec\n" "$temp_ecoule"
 
 # Vérification de l'exécutable C
-#touch tmp/fichier_tmp_result.csv # Crée un fichier vide nommé fichier_tmp_result dans tmp
-executable="./codeC/exec" # L'exécutable est dans le dossier codeC
+executable="./codeC/exec" # Chemin vers l'exécutable du programme C
+
+# Vérification si l'exécutable existe et est fonctionnel
 if [ ! -x "$executable" ]; then # Si le fichier est executable
     echo "Compilation du programme C..."
-    make -C codeC clean # Nettoie les fichiers précédents
-    make -C codeC all # Exécute le Makefile dans le dossier codeC
+    make -C codeC clean # Nettoyage des anciennes compilations
+    make -C codeC all  # Compilation des fichiers avec Makefile
+
+     # Si la compilation échoue, on affiche une erreur
     if [ $? -ne 0 ]; then # Si la compilation échoue, on affiche une erreur
         echo "Erreur : Échec de la compilation du programme C."
         echo "temps : 0.0sec"
@@ -197,6 +213,7 @@ if [ $? -ne 0 ]; then
     exit 8
 fi
 
+# Vérification du fichier de sortie temporaire généré par le programme C
 if [ ! -f "tmp/fichier_tmp_result.csv" ]; then
     echo "Erreur : Le fichier 'tmp/fichier_tmp_result.csv' n'a pas été créé."
     exit 1
