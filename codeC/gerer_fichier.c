@@ -45,7 +45,7 @@ void recuperer_info_csv(pavl *a) {
 
         // Conversion de la capacité avec strtol
         char *endptr;
-        long capacite = strtol(colonne2, &endptr, 10);
+        long capacite = strtol(colonne2, &endptr, 10); //la fonction strtol sert a convertir des chaine de caractere en long
         if (*endptr != '\0' || capacite < 0) {
             printf("Erreur : Capacité invalide dans la ligne : '%s'\n", ligne);
             continue;
