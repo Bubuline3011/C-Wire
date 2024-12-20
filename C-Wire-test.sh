@@ -86,7 +86,7 @@ if ! [[ $id_centrale =~ ^[1-5]$ ]] && [[ $id_centrale != -1 ]]; then
   exit 8
 fi
 
-# on verfie que le fichier tmp n'existe pas et on le creer sinon ont le vide
+# on vérifie que le fichier tmp n'existe pas et on le créer sinon ont le vide
 if [ ! -d "tmp" ]; then
     echo "Le dossier 'tmp' n'existe pas. Création."
     mkdir -p tmp
@@ -96,7 +96,7 @@ else
     rm -rf tmp/* #surprime tout ce qui est a l'interieur  
 fi
 
-# on verfie que le fichier graph n'existe pas et on le creer 
+# on vérifie que le fichier graph n'existe pas et on le créer 
 if [ ! -d "graphs" ]; then
 # Création du dossier graphs s'il n'existe pas
     echo "Le dossier 'graphs' n'existe pas. Création."
@@ -132,7 +132,7 @@ echo "Station est : $conso"
 echo "fichier est : $chemin_fichier"
 
 
-#Filtrage par numéro de centrale si si applicable
+#Filtrage par numéro de centrale si applicable
 if [[ "$id_centrale" -ne -1 ]]; then
     grep -E "^$id_centrale;" "$chemin_fichier" > "tmp/centrale_filtrees.csv"
 
@@ -197,7 +197,7 @@ if [ ! -x "$executable" ]; then # Si le fichier est executable
     make -C codeC all  # Compilation des fichiers avec Makefile
 
      # Si la compilation échoue, on affiche une erreur
-    if [ $? -ne 0 ]; then # Si la compilation échoue, on affiche une erreur
+    if [ $? -ne 0 ]; then 
         echo "Erreur : Échec de la compilation du programme C."
         echo "temps : 0.0sec"
         exit 7
