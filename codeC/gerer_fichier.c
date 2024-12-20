@@ -6,7 +6,7 @@ void recuperer_info_csv(pavl *a) {
         exit(12);
     }
 
-    FILE *f = fopen("tmp/donnees_filtrees.csv", "r");
+    FILE *f = fopen("/home/cytech/C-Wire-main/tmp/donnees_filtrees.csv", "r");
     if (f == NULL) {
         printf("Ouverture du fichier impossible\n");
         printf("code d'erreur = %d\n", errno);
@@ -89,6 +89,7 @@ void ecrire_ds_fichier_result_tmp(pavl a){
 		printf("L'arbre n'a pas été crée\n");
 		exit(8);
 	}
+	printf("Tentative d'ouverture ou de création du fichier dans 'tmp'.\n");
 	FILE * f = fopen("tmp/fichier_tmp_result.csv", "w");// Le mode 'w' permet d'écraser les données précédentes dans le fichier temporaire de resultat
 	if(f == NULL){
 		printf("Ouverture du fichier impossible\n");
@@ -96,8 +97,8 @@ void ecrire_ds_fichier_result_tmp(pavl a){
 		printf("Message d'erreur = %s \n", strerror(errno));
 		exit(16);
 	}
+	printf("Fichier temporaire ouvert avec succès pour écriture.\n");
 	parcoursInfixe(a, f);
 	printf("Écriture dans le fichier temporaire terminée.\n");
 	fclose(f);
 }
-
