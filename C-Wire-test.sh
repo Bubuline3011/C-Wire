@@ -191,7 +191,7 @@ fi
 
 fichier_result="tmp/fichier_tmp_result.csv"
 
-if [ -f "$fichier_result" ]; then
+if [ -s "$fichier_result" ]; then
     cat "$fichier_result" >> "$fichier_sortie" # Ajoute au fichier de sortie
     #rm "$fichier_result"                      # Supprime le fichier temporaire
     echo "Fichier temporaire traité avec succès et ajouté a $fichier_sortie."
