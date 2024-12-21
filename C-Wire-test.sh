@@ -114,7 +114,7 @@ else
 fi
 
 # Ajout de l'en-tête au fichier de sortie
-echo "Station $station;Capacité;Consommation" > "$fichier_sortie"
+echo "Station $station;Capacité;Consommation ($conso)" > "$fichier_sortie"
 
 #filtrage et autres
 temp_debut=$(date +%s.%N) # prend l'heure du début
@@ -259,7 +259,7 @@ if [ -e "lv_all.csv" ]; then
 
 	# Fusionner et trier les résultats par quantité absolue d’énergie consommée en trop
 	{
-    		echo "Station LV:Capacité:Consommation"
+    		echo "Station LV:Capacité:Consommation (tous)"
     		cat "tmp/lv_all_min.csv" "tmp/lv_all_max.csv" | sort -t':' -k4,4n | cut -d':' -f1-3
 	} > "lv_all_minmax.csv"
 	echo "La creation du fichier lv_all_minmax.csv a bien été realisé"
@@ -280,7 +280,7 @@ if [ -e "lv_all_$id_centrale.csv" ]; then
 
 	# Fusionner et trier les résultats par quantité absolue d’énergie consommée en trop
 	{
-    		echo "Station LV:Capacité:Consommation"
+    		echo "Station LV:Capacité:Consommation (tous)"
     		cat "tmp/lv_all_min_$id_centrale.csv" "tmp/lv_all_max_$id_centrale.csv" | sort -t':' -k4,4n | cut -d':' -f1-3
 	} > "lv_all_minmax.csv"
 	echo "La creation du fichier lv_all_minmax.csv a bien été realisé"
