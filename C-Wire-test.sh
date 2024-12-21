@@ -267,12 +267,12 @@ fi
 
 if [ -e "lv_all_$id_centrale.csv" ]; then
 	#calcule de la différence, de sa valeur absolue, trie et enregistrement dans un fichier temporaire
-	awk -F':' -v OFS=':' ' 
+	awk -F':' -v OFS=':' -v OFMT="%.f" ' 
 	NR > 1 {
     		diff = $2 - $3;
     		diff_abs = (diff < 0) ? -diff : diff; # Calculer la valeur absolue de diff
     		print $1, $2, $3, diff_abs
-	}' "lv_all.csv" | sort -t':' -k4,4n > "tmp/lv_all__trie_diff_abs_$id_centrale.csv"
+	}' "lv_all_$id_centrale.csv" | sort -t':' -k4,4n > "tmp/lv_all__trie_diff_abs_$id_centrale.csv"
 
 	# Extraire les 10 postes les plus chargés et les 10 postes les moins chargés
 	head -n 10 "tmp/lv_all__trie_diff_abs_$id_centrale.csv" > "tmp/lv_all_min_$id_centrale.csv"
