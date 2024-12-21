@@ -1,13 +1,17 @@
 #include "projet.h"
 
+// Procédure pour récupérer les informations d'un fichier CSV et les insérer dans l'arbre AVL
 void recuperer_info_csv(pavl *a) {
+    // Vérifie si l'arbre est vide avant de continuer.
     if (*a != NULL) {
         printf("Erreur : L'arbre n'est pas vide\n");
         exit(12);
     }
 
+    // Ouvre le fichier CSV en mode lecture.
     FILE *f = fopen("/home/cytech/C-Wire-main/tmp/donnees_filtrees.csv", "r");
     if (f == NULL) {
+        // Affiche un message d'erreur en cas d'échec d'ouverture.
         printf("Ouverture du fichier impossible\n");
         printf("code d'erreur = %d\n", errno);
         printf("Message d'erreur = %s\n", strerror(errno));
