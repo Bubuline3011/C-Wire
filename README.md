@@ -44,7 +44,7 @@ Consignes avant de pouvoir utiliser le projet  :
 4. Pour rendre le fichier executable, ecrire : **chmod 777 C-Wire-test.sh**
 5. Exécuter le script shell. Syntaxe générale : **./C-Wire-test.sh input/<fichier_csv> <type_station> <type_consommateur> [id_centrale]**
 6. Si vous avez besoin d'aide vous pouvez ecrire : **./C-Wire.sh -h**. Une page d'aide s'affichera alors.
-
+7. Note : si vous souhaitez à nouveau recommencer la commande, il est conseillé de supprimer les fichiers temporaires et mettre ailleurs les fichiers finaux.
 ## Auteurs
 
 - Bulard Yona - Initial Work - Bubuline3011
