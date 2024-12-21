@@ -34,6 +34,7 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 ### Prérequis 
 
 - Un terminal
+- Un fichier d'entrée
 
 ## Utilisation
 
