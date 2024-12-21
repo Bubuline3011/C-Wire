@@ -42,7 +42,7 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 Consignes avant de pouvoir utiliser le projet  : 
 1. Télécharger le dossier en cliquant sur "code", puis "Download Zip".
 2. Extraire le dossier.
-3. Mettre votre fichier d'entrée dans le dossier input.
+3. Mettre votre fichier d'entrée dans le dossier **input**.
 4. Ecrire dans le terminal : **cd nom_du_dossier** (le nom est normalement C-Wire-main).
 5. Pour rendre le fichier executable, ecrire : **chmod 777 C-Wire-test.sh**
 6. Exécuter le script shell. Syntaxe générale : **./C-Wire-test.sh input/<fichier_csv> <type_station> <type_consommateur> [id_centrale]**
