@@ -19,8 +19,9 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 [📄 Projet C-Wire](Projet_C-Wire_preIng2_2024_2025-v1.4-1.pdf)
 
 
-## Structure 
+## Structure
 
+- **`C-Wire-test.sh`**: contient le script en shell, il premet notamment de filtrer des données.
 - **`main.c`** : contient la fonction principale
 - **`projet.h`** : contient la déclaration de toutes les fonctions, les structures, les constantes et les inclusions de bibliothèques.
 - **`avl.c`** : contient toutes les fonctions relatives a l'avl, comme la creation, l'insertion, les différents types de rotations etc..
