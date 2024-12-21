@@ -73,36 +73,60 @@ void recuperer_info_csv(pavl *a) {
     fclose(f);
 }
 	
-void parcoursInfixe(pavl a, FILE* f){
-	if(f == NULL){
-		printf("Le fichier n'existe pas\n");
-		exit(18);
-	}
-	if(a != NULL){ // si a est NULL pas besoin d'ecrire dans le fichier
-		parcoursInfixe(a->fg, f);
-		if (fprintf(f, "%d:%ld:%ld\n", a->station->id, a->station->capacite, a->station->conso) < 0) {
-    			printf("Erreur : Échec d'écriture dans le fichier temporaire.\n");
-    			exit(17);
-		}
-		parcoursInfixe(a->fd, f);
-	}
+// Procédure de parcours infixe d'un arbre AVL et écriture des données dans un fichier.
+void parcoursInfixe(pavl a, FILE* f) {
+    // Vérifie si le fichier est valide.
+    if (f == NULL) {
+        printf("Le fichier n'existe pas\n");
+        exit(18);
+    }
+
+    // Si le noeud actuel n'est pas NULL, continue le parcours.
+    if (a != NULL) {
+        // Parcourt récursivement le sous-arbre gauche.
+        parcoursInfixe(a->fg, f);
+
+        // Écrit les données du noeud courant dans le fichier.
+        if (fprintf(f, "%d:%ld:%ld\n", a->station->id, a->station->capacite, a->station->conso) < 0) {
+            printf("Erreur : Échec d'écriture dans le fichier temporaire.\n");
+            exit(17);
+        }
+
+        // Parcourt récursivement le sous-arbre droit.
+        parcoursInfixe(a->fd, f);
+    }
 }
 
-void ecrire_ds_fichier_result_tmp(pavl a){ 
-	if(a == NULL){
-		printf("L'arbre n'a pas été crée\n");
-		exit(8);
-	}
-	printf("Tentative d'ouverture ou de création du fichier dans 'tmp'.\n");
-	FILE * f = fopen("tmp/fichier_tmp_result.csv", "w");// Le mode 'w' permet d'écraser les données précédentes dans le fichier temporaire de resultat
-	if(f == NULL){
-		printf("Ouverture du fichier impossible\n");
-		printf("code d'erreur = %d \n", errno );
-		printf("Message d'erreur = %s \n", strerror(errno));
-		exit(16);
-	}
-	printf("Fichier temporaire ouvert avec succès pour écriture.\n");
-	parcoursInfixe(a, f);
-	printf("Écriture dans le fichier temporaire terminée.\n");
-	fclose(f);
+// Procédure pour écrire les données de l'arbre AVL dans un fichier temporaire au format CSV.
+void ecrire_ds_fichier_result_tmp(pavl a) { 
+    // Vérifie si l'arbre est vide.
+    if (a == NULL) {
+        printf("L'arbre n'a pas été crée\n");
+        exit(8);
+    }
+
+    // Message indiquant une tentative d'ouverture ou de création du fichier.
+    printf("Tentative d'ouverture ou de création du fichier dans 'tmp'.\n");
+
+    // Ouvre le fichier temporaire en mode écriture ('w' écrase les données existantes).
+    FILE *f = fopen("tmp/fichier_tmp_result.csv", "w");
+    if (f == NULL) {
+        // Gestion des erreurs d'ouverture avec affichage du code et message d'erreur.
+        printf("Ouverture du fichier impossible\n");
+        printf("code d'erreur = %d \n", errno);
+        printf("Message d'erreur = %s \n", strerror(errno));
+        exit(16);
+    }
+
+    // Message indiquant que le fichier a été ouvert avec succès.
+    printf("Fichier temporaire ouvert avec succès pour écriture.\n");
+
+    // Parcourt l'arbre et écrit les données dans le fichier.
+    parcoursInfixe(a, f);
+
+    // Message indiquant la fin de l'écriture dans le fichier.
+    printf("Écriture dans le fichier temporaire terminée.\n");
+
+    // Ferme le fichier après écriture.
+    fclose(f);
 }
