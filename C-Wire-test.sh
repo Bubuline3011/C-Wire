@@ -286,37 +286,38 @@ if [ -e "lv_all_$id_centrale.csv" ]; then
 	echo "La creation du fichier lv_all_minmax.csv a bien été realisé"
 fi
 
+make -C codeC clean-all
+
 #Partie bonus :
 # Vérifier si Gnuplot est installé
 if ! command -v gnuplot &> /dev/null; then
-    echo "Erreur : Gnuplot n'est pas installé."
-    exit 1
+	echo "Erreur : Gnuplot n'est pas installé."
+	exit 1
 fi
 
 # Génération du graphique
 gnuplot << gnuplot
-	set terminal png size 800,600
-	set output "graphs/bonus.png"
-	set title "Postes LV - Consommation et Capacité"
-	set xlabel "Station"
-	set ylabel "Différence (Capacité - Consommation)"
-	set grid
-	set style data histogram
-	set style histogram cluster gap 1
-	set style fill solid 1.00 border -1
-	set boxwidth 0.75
-	set xtics rotate by -45
-	set key outside
+    set terminal png size 800,600
+    set output "graphs/bonus.png"
+    set title "Postes LV - Consommation et Capacité"
+    set xlabel "Station"
+    set ylabel "Différence (Capacité - Consommation)"
+    set grid
+    set style data histogram
+    set style histogram cluster gap 1
+    set style fill solid 1.00 border -1
+    set boxwidth 0.75
+    set xtics rotate by -45
+    set key outside
 
 # Définir les couleurs pour les barres
-	set palette model RGB defined ( 0 "green", 1 "red" )
+    set palette model RGB defined ( 0 "green", 1 "red" )
 
 plot "$fichier_sortie" using 2:xtic(1) linecolor palette frac (column(2)<0?1:0) with boxes
 gnuplot
 #ecrire : si il existe lv_all_minmax.csv on fait le trux en dessous et pareill pour lv_all_minmax_$id_centrale.csv
 echo "Graphique généré : graphs/bonus.png"
 
-make clean
 
 echo "FIN du script"
 
