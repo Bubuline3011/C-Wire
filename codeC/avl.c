@@ -63,16 +63,21 @@ pavl insertionAVL(pavl a, int id, long capacite, long conso, int * h) {
     	return a;
 }
 
+// Fonction de recherche dans l'AVL:
 int recherche(pavl noeud, int id) {
-    	if (noeud == NULL){
+	// Si le noeud est NULL, l'identifiant n'est pas trouvé.
+  	if (noeud == NULL){
     		return 0;
 	}
+		// Si l'identifiant correspond, retourne 1.
 	else if(noeud->station->id == id){
         	return 1;
     	}
+    // Recherche dans le sous-arbre gauche si l'identifiant est plus petit.
     	if (id < noeud->station->id) {
         	return recherche(noeud->fg, id);
     	} 
+		// Recherche dans le sous-arbre droit si l'identifiant est plus grand.
     	else if (id > noeud->station->id) {
         	return recherche(noeud->fd, id);
     	} 
@@ -143,15 +148,19 @@ pavl equilibreAVL(pavl a){
 }
 
 void supprimer_AVL(pavl a){
-	if(a != NULL){
-		if(a->fg != NULL){
-			supprimer_AVL(a->fg);
+	if(a != NULL){      // Vérifie si le noeud n'est pas NULL.
+
+	if(a->fg != NULL){
+         	supprimer_AVL(a->fg);       // Supprime récursivement le sous-arbre gauche.
+
 		}
-		if(a->fd != NULL){
-			supprimer_AVL(a->fd);
+	     // Supprime récursivement le sous-arbre droit.
+             if(a->fd != NULL){
+              		supprimer_AVL(a->fd);
 		}
-		free(a->station);
-		free(a);
+		free(a->station);         // Libère la mémoire de la station associée au noeud.
+		free(a);          // Libère la mémoire du noeud.
+
 	}
 }
 
