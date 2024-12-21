@@ -33,7 +33,7 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 
 ### Prérequis 
 
-- Un terminal C
+- Un terminal
 
 ## Utilisation
 
