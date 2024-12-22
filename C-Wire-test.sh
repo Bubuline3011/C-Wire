@@ -303,6 +303,35 @@ fi
 
 make -C codeC clean-all
 
+#Partie bonus :
+# Vérifier si Gnuplot est installé
+if ! command -v gnuplot &> /dev/null; then
+	echo "Erreur : Gnuplot n'est pas installé."
+	exit 1
+fi
+
+# Génération du graphique
+# Générer le graphique avec gnuplot
+gnuplot << EOF
+	set terminal pngcairo size 1200,700 enhanced font "Comic Sans MS,12"
+	set output 'graphs/bonus.png'
+
+	set title "Postes LV - Capacité et Consommation" font "Comic Sans MS,16"
+	set xlabel "Poste LV" font "Comic Sans MS,12"
+	set ylabel "Valeurs (kWh)" font "Comic Sans MS,12"
+	set grid ytics
+	set style fill solid border -1
+	set boxwidth 0.4
+	set key outside top center font "Comic Sans MS,10"
+	set xtics rotate by -45 font "Comic Sans MS,10"
+	set datafile separator ":"
+	# Tracer les barres pour Capacité et Consommation
+	plot 'lv_all_minmax.csv' using 0:2:xtic(1) with boxes lc rgb "green" title "Capacité", \
+     '' using 0:3:xtic(1) with boxes lc rgb "red" title "Consommation"
+EOF
+
+echo "Graphique généré : graphs/bonus.png"
+
 echo "FIN du script"
 
 
