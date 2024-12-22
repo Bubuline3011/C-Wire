@@ -325,8 +325,8 @@ gnuplot << script_gnuplot
 	#specifier le separateur
 	set datafile separator ":"
 	# Tracer les barres pour Capacité et Consommation
-	plot 'lv_all_minmax.csv' using 0:2:xtic(1) with boxes lc rgb "green" title "Capacité", \
-     '' using 0:3:xtic(1) with boxes lc rgb "red" title "Consommation"
+	plot 'lv_all_minmax.csv' using 0:2:xtic(1) with boxes lc rgb "red" title "Capacité", \
+     '' using 0:3:xtic(1) with boxes lc rgb "green" title "Consommation"
 script_gnuplot
 
 echo "Graphique généré : graphs/bonus.png"
