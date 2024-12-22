@@ -30,7 +30,7 @@ Pour plus de détails sur le projet, consultez la documentation du projet :
 - **`gerer_fichier.c`** : contient les fonctions qui créent les fichier de sortie et qui ecrivent dedans.
 - **`Makefile`** : permet d'automatiser la compilation.
 - **Rapport de projet C-Wire.pdf** : contient un compte rendu sur l'organisation de l'équipe concernant le projet, les difficultés rencontrées et une brève description du projet.
-- Le dossier **test** : contient tous les résultats obtenus.
+- Le dossier **test** : contient une grande partie des résultats obtenus.
 - Le dossier **input** : contiendra le fichier d'entrée.
 
 ## Installation 
