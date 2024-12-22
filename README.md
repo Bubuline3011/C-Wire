@@ -53,7 +53,7 @@ Consignes avant de pouvoir utiliser le projet  :
 8. Note : si vous souhaitez à nouveau recommencer la commande, il est conseillé de supprimer les fichiers temporaires et mettre ailleurs les fichiers finaux afin d'éviter tout problème.
 ## Auteurs
 
-- Bulard Yona - Initial Work - Bubuline3011
-- Kallel Ala - Initial Work - zquaddy
-- Attia Karin - Initial Work - attiakarin
+- Bulard Yona - Travaux initiaux - Bubuline3011
+- Kallel Ala - Travaux initiaux - zquaddy
+- Attia Karin - Travaux initiaux - attiakarin
 
