@@ -243,47 +243,62 @@ mv "tmp/fichier_croissant.csv" "$fichier_sortie" # on remplace le fichier de sor
 
 echo "Le fichier a été trié par ordre croissant"
 
-#Traitement supplementaire dans le cas de lv all
 if [ -e "lv_all.csv" ]; then
-	#calcule de la différence, de sa valeur absolue, trie et enregistrement dans un fichier temporaire
-	awk -F':' -v OFS=':' -v OFMT="%.f" ' 
-	NR > 1 {
-    		diff = $2 - $3;
-    		diff_abs = (diff < 0) ? -diff : diff; # Calculer la valeur absolue de diff
-    		print $1, $2, $3, diff_abs
-	}' "lv_all.csv" | sort -t':' -k4,4n > "tmp/lv_all_trie_diff_abs.csv"
+    # 1 : Trier les postes par consommation uniquement
+    sort -t':' -k3,3n "lv_all.csv" > "tmp/lv_all_trie_consommation.csv"
 
-	# Extraire les 10 postes les plus chargés et les 10 postes les moins chargés
-	head -n 10 "tmp/lv_all_trie_diff_abs.csv" > "tmp/lv_all_min.csv"
-	tail -n 10 "tmp/lv_all_trie_diff_abs.csv" > "tmp/lv_all_max.csv"
+    # Extraire les 10 postes avec la consommation la plus faible
+    head -n 10 "tmp/lv_all_trie_consommation.csv" > "tmp/lv_all_min_consommation.csv"
 
-	# Fusionner et trier les résultats par quantité absolue d’énergie consommée en trop
-	{
-    		echo "Station LV:Capacité:Consommation (tous)"
-    		cat "tmp/lv_all_min.csv" "tmp/lv_all_max.csv" | sort -t':' -k4,4n | cut -d':' -f1-3
-	} > "lv_all_minmax.csv"
-	echo "La creation du fichier lv_all_minmax.csv a bien été realisé"
-fi
+    # Extraire les 10 postes avec la consommation la plus élevée
+    tail -n 10 "tmp/lv_all_trie_consommation.csv" > "tmp/lv_all_max_consommation.csv"
 
-if [ -e "lv_all_$id_centrale.csv" ]; then
-	#calcule de la différence, de sa valeur absolue, trie et enregistrement dans un fichier temporaire
-	awk -F':' -v OFS=':' -v OFMT="%.f" ' 
-	NR > 1 {
-    		diff = $2 - $3;
-    		diff_abs = (diff < 0) ? -diff : diff; # Calculer la valeur absolue de diff
-    		print $1, $2, $3, diff_abs
-	}' "lv_all_$id_centrale.csv" | sort -t':' -k4,4n > "tmp/lv_all__trie_diff_abs_$id_centrale.csv"
+    # 2 : Réunir les 20 postes dans un fichier temporaire
+    cat "tmp/lv_all_min_consommation.csv" "tmp/lv_all_max_consommation.csv" > "tmp/lv_all_20_selectionnes.csv"
 
-	# Extraire les 10 postes les plus chargés et les 10 postes les moins chargés
-	head -n 10 "tmp/lv_all__trie_diff_abs_$id_centrale.csv" > "tmp/lv_all_min_$id_centrale.csv"
-	tail -n 10 "tmp/lv_all__trie_diff_abs_$id_centrale.csv" > "tmp/lv_all_max_$id_centrale.csv"
+    # 3 : Calculer la différence absolue pour ces 20 postes et trier
+    awk -F':' -v OFS=':' -v OFMT="%.f" '
+    NR > 1 {
+        diff = $2 - $3;
+        diff_abs = (diff < 0) ? -diff : diff;
+        print $1, $2, $3, diff_abs
+    }' "tmp/lv_all_20_selectionnes.csv" | sort -t':' -k4,4nr > "tmp/lv_all_trie_diff_abs.csv"
 
-	# Fusionner et trier les résultats par quantité absolue d’énergie consommée en trop
-	{
-    		echo "Station LV:Capacité:Consommation (tous)"
-    		cat "tmp/lv_all_min_$id_centrale.csv" "tmp/lv_all_max_$id_centrale.csv" | sort -t':' -k4,4n | cut -d':' -f1-3
-	} > "lv_all_minmax.csv"
-	echo "La creation du fichier lv_all_minmax.csv a bien été realisé"
+    # 4 : Créer le fichier final sans la colonne de différence
+    {
+        echo "Station LV:Capacité:Consommation (tous)"
+        cut -d':' -f1-3 "tmp/lv_all_trie_diff_abs.csv"
+    } > "lv_all_minmax.csv"
+
+    echo "La création du fichier lv_all_minmax.csv a bien été réalisée"
+elif [ -e "lv_all_$id_centrale.csv" ]; then
+    # 1 : Trier les postes par consommation uniquement
+    sort -t':' -k3,3n "lv_all_$id_centrale.csv" > "tmp/lv_all_trie_consommation.csv"
+
+    # Extraire les 10 postes avec la consommation la plus faible
+    head -n 10 "tmp/lv_all_trie_consommation.csv" > "tmp/lv_all_min_consommation.csv"
+
+    # Extraire les 10 postes avec la consommation la plus élevée
+    tail -n 10 "tmp/lv_all_trie_consommation.csv" > "tmp/lv_all_max_consommation.csv"
+
+    # 2 : Réunir les 20 postes dans un fichier temporaire
+    cat "tmp/lv_all_min_consommation.csv" "tmp/lv_all_max_consommation.csv" > "tmp/lv_all_20_selectionnes.csv"
+
+    # 3 : Calculer la différence absolue pour ces 20 postes et trier
+    awk -F':' -v OFS=':' -v OFMT="%.f" '
+    NR > 1 {
+        diff = $2 - $3;
+        diff_abs = (diff < 0) ? -diff : diff;
+        print $1, $2, $3, diff_abs
+    }' "tmp/lv_all_20_selectionnes.csv" | sort -t':' -k4,4nr > "tmp/lv_all_trie_diff_abs.csv"
+
+    # 4 : Créer le fichier final sans la colonne de différence
+    {
+        echo "Station LV:Capacité:Consommation (tous)"
+        cut -d':' -f1-3 "tmp/lv_all_trie_diff_abs.csv"
+    } > "lv_all_minmax.csv"
+
+    echo "La création du fichier lv_all_minmax.csv a bien été réalisée"
 fi
 
 make -C codeC clean-all
